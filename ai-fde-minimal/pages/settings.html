@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI FDE 助手 - 设置</title>
+    <style id="theme-vars">
+/* Source: structured-spec — monochrome minimalist palette (black/white/gray) */
+/* ============================================================
+   PRIMITIVES (theme-independent)
+   Six families: brand / background / text / icon are 10-step
+   scales; state-success / state-error are functional sets.
+   The system is monochrome — `brand` is a refined cool-neutral
+   scale used for primary surfaces/actions; the other neutrals
+   share the pure-gray ramp. Never consume primitives directly
+   in product code — use the semantic role tokens or the
+   --color-* alias layer below.
+   ============================================================ */
+:root {
+  /* brand — refined cool-neutral identity (primary, ring, charts) */
+  --brand-50: #fafafa;
+  --brand-100: #f4f4f5;
+  --brand-200: #e4e4e7;
+  --brand-300: #d4d4d8;
+  --brand-400: #a1a1aa;
+  --brand-500: #71717a;
+  --brand-600: #52525b;
+  --brand-700: #3f3f46;
+  --brand-800: #27272a;
+  --brand-900: #18181b;
+
+  /* background — pure-neutral surface ramp */
+  --background-50: #ffffff;
+  --background-100: #fafafa;
+  --background-200: #f5f5f5;
+  --background-300: #e5e5e5;
+  --background-400: #d4d4d4;
+  --background-500: #a3a3a3;
+  --background-600: #404040;
+  --background-700: #262626;
+  --background-800: #171717;
+  --background-900: #0a0a0a;
+
+  /* text — pure-neutral ink ramp */
+  --text-50: #fafafa;
+  --text-100: #ededed;
+  --text-200: #d4d4d4;
+  --text-300: #a1a1a1;
+  --text-400: #858585;
+  --text-500: #6e6e6e;
+  --text-600: #525252;
+  --text-700: #404040;
+  --text-800: #171717;
+  --text-900: #0a0a0a;
+
+  /* icon — pure-neutral icon ramp */
+  --icon-50: #fafafa;
+  --icon-100: #e5e5e5;
+  --icon-200: #d4d4d4;
+  --icon-300: #b0b0b0;
+  --icon-400: #8f8f8f;
+  --icon-500: #6e6e6e;
+  --icon-600: #525252;
+  --icon-700: #404040;
+  --icon-800: #262626;
+  --icon-900: #0a0a0a;
+
+  /* SEMANTIC ROLE TOKENS — light theme */
+  --background: var(--background-50);
+  --card: var(--background-50);
+  --popover: var(--background-50);
+  --muted: var(--background-100);
+
+  --foreground: var(--brand-900);
+  --card-foreground: var(--brand-900);
+  --popover-foreground: var(--brand-900);
+  --primary-foreground: #ffffff;
+  --secondary-foreground: var(--brand-900);
+  --muted-foreground: var(--brand-500);
+  --accent-foreground: var(--brand-900);
+  --destructive-foreground: var(--background-50);
+  --sidebar-foreground: var(--brand-900);
+  --sidebar-primary-foreground: var(--brand-50);
+  --sidebar-accent-foreground: var(--brand-900);
+
+  --primary: #2563ef;
+  --secondary: var(--brand-100);
+  --accent: var(--brand-100);
+  --input: var(--brand-200);
+  --ring: #2563ef;
+
+  --border: #e5e5e5;
+  --border-strong: var(--brand-300);
+
+  --success: #16a34a;
+  --success-foreground: var(--background-50);
+  --success-subtle: #f0fdf4;
+  --success-border: #bbf7d0;
+  --success-text: #15803d;
+
+  --destructive: #dc2626;
+  --destructive-subtle: #fef2f2;
+  --destructive-border: #fecaca;
+  --destructive-text: #b91c1c;
+
+  --brand-subtle: var(--brand-100);
+  --brand-border: var(--brand-300);
+
+  --chart-1: var(--brand-200);
+  --chart-2: var(--brand-400);
+  --chart-3: var(--brand-600);
+  --chart-4: var(--brand-800);
+  --chart-5: var(--brand-900);
+
+  --sidebar: var(--brand-50);
+  --sidebar-primary: var(--brand-900);
+  --sidebar-accent: var(--brand-100);
+  --sidebar-border: var(--brand-200);
+  --sidebar-ring: var(--brand-400);
+
+  /* typography */
+  --font-sans: Geist, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Serif Display, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --tracking-normal: 0em;
+  --tracking-tight: -0.012em;
+
+  /* radius — flat design override */
+  --radius: 25.2px;
+  --radius-sm: 25.2px;
+  --radius-lg: 25.2px;
+
+  /* shadow — none for flat design */
+  --shadow-2xs: none;
+  --shadow-xs: none;
+  --shadow-sm: none;
+  --shadow: none;
+  --shadow-md: none;
+  --shadow-lg: none;
+  --shadow-xl: none;
+  --shadow-2xl: none;
+
+  /* layout */
+  --spacing: 4px;
+
+  /* ALIAS LAYER */
+  --color-surface: var(--background);
+  --color-surface-muted: var(--muted);
+  --color-text: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-brand: var(--primary);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-border: var(--brand-border);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-success-50: var(--success-subtle);
+  --color-success-200: var(--success-border);
+  --color-success-600: var(--success);
+  --color-success-700: var(--success-text);
+  --color-danger-50: var(--destructive-subtle);
+  --color-danger-200: var(--destructive-border);
+  --color-danger-600: var(--destructive);
+  --color-danger-700: var(--destructive-text);
+  --space-4: var(--spacing);
+  --radius-md: var(--radius);
+}
+
+    </style>
+    <style id="component-vars">
+/* ═══════════════════════════════════════════════════════════════
+   components.css — Design System Component Definitions
+   ═══════════════════════════════════════════════════════════════ */
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-foreground: var(--card-foreground);
+    --color-background: var(--background);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-destructive-foreground: var(--destructive-foreground);
+    --color-success: var(--success);
+    --color-success-text: var(--success-text);
+    --radius-md: 25.2px;
+    --radius-sm: 25.2px;
+    --radius-lg: 25.2px;
+  }
+  @layer base {
+    body { background: #ffffff; color: #18181b; }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ── Blue accent overrides ── */
+      :root {
+        --blue: #2563ef;
+        --blue-foreground: #ffffff;
+        --danger-text: #cf001c;
+      }
+
+      /* ── Settings-specific styles ── */
+      body {
+        font-family: Geist, ui-sans-serif, sans-serif, system-ui;
+        background: #ffffff;
+        color: #18181b;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .settings-card {
+        background: #ffffff;
+        border: 1px solid #e5e5e5;
+        border-radius: 25.2px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+      }
+
+      .settings-card-title {
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-weight: 600;
+        font-size: 14px;
+        color: #18181b;
+        margin-bottom: 16px;
+        letter-spacing: 0em;
+      }
+
+      .field-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: #858585;
+        margin-bottom: 6px;
+      }
+
+      .field-row {
+        margin-bottom: 16px;
+      }
+
+      .field-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .settings-input,
+      .settings-select {
+        width: 100%;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 25.2px;
+        background: #ffffff;
+        color: #18181b;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s;
+        box-shadow: none;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      .settings-input:focus,
+      .settings-select:focus {
+        border-color: #2563ef;
+      }
+
+      .settings-input.mono {
+        font-family: Geist Mono, ui-monospace, monospace;
+        font-size: 12px;
+      }
+
+      .settings-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23858585' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 36px;
+      }
+
+      /* ── Password field with eye toggle ── */
+      .password-wrapper {
+        position: relative;
+      }
+
+      .password-wrapper .settings-input {
+        padding-right: 40px;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 4px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #858585;
+        border-radius: 50%;
+        transition: color 0.15s;
+      }
+
+      .password-toggle:hover {
+        color: #18181b;
+      }
+
+      /* ── Outlined blue button ── */
+      .btn-outline-blue {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 36px;
+        padding: 0 16px;
+        border: 1px solid #2563ef;
+        border-radius: 25.2px;
+        background: transparent;
+        color: #2563ef;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .btn-outline-blue:hover {
+        background: #2563ef;
+        color: #ffffff;
+      }
+
+      /* ── Filled blue button (primary) ── */
+      .btn-filled-blue {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 44px;
+        border: none;
+        border-radius: 25.2px;
+        background: #2563ef;
+        color: #ffffff;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+
+      .btn-filled-blue:hover {
+        opacity: 0.9;
+      }
+
+      /* ── Toggle switch (CSS-only) ── */
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 14px;
+      }
+
+      .toggle-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .toggle-label {
+        font-size: 13px;
+        color: #18181b;
+      }
+
+      .toggle-switch {
+        position: relative;
+        width: 40px;
+        height: 22px;
+        flex-shrink: 0;
+      }
+
+      .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+        position: absolute;
+      }
+
+      .toggle-track {
+        position: absolute;
+        inset: 0;
+        background: #e5e5e5;
+        border-radius: 11px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .toggle-track::after {
+        content: '';
+        position: absolute;
+        left: 2px;
+        top: 2px;
+        width: 18px;
+        height: 18px;
+        background: #ffffff;
+        border-radius: 50%;
+        transition: transform 0.2s;
+        box-shadow: none;
+      }
+
+      .toggle-switch input:checked + .toggle-track {
+        background: #2563ef;
+      }
+
+      .toggle-switch input:checked + .toggle-track::after {
+        transform: translateX(18px);
+      }
+
+      .toggle-switch input:focus-visible + .toggle-track {
+        outline: 2px solid #2563ef;
+        outline-offset: 2px;
+      }
+
+      /* ── Danger link-style button ── */
+      .btn-danger-link {
+        display: inline-block;
+        font-size: 13px;
+        color: #cf001c;
+        background: none;
+        border: none;
+        border-bottom: 1px solid #cf001c;
+        cursor: pointer;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        padding: 0;
+        transition: opacity 0.15s;
+      }
+
+      .btn-danger-link:hover {
+        opacity: 0.8;
+      }
+
+      /* ── Inline confirm ── */
+      .confirm-inline {
+        display: none;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+        font-size: 13px;
+        color: #18181b;
+      }
+
+      .confirm-inline.active {
+        display: flex;
+      }
+
+      .confirm-inline .btn-confirm-yes {
+        height: 30px;
+        padding: 0 12px;
+        border: none;
+        border-radius: 25.2px;
+        background: #cf001c;
+        color: #ffffff;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+
+      .confirm-inline .btn-confirm-yes:hover {
+        opacity: 0.85;
+      }
+
+      .confirm-inline .btn-confirm-no {
+        height: 30px;
+        padding: 0 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 25.2px;
+        background: transparent;
+        color: #858585;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .confirm-inline .btn-confirm-no:hover {
+        border-color: #18181b;
+        color: #18181b;
+      }
+
+      /* ── Connection success message ── */
+      .test-result {
+        display: none;
+        margin-top: 8px;
+        font-size: 12px;
+        color: #15803d;
+      }
+
+      .test-result.active {
+        display: block;
+      }
+
+      /* ── Toast ── */
+      .toast {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%) translateY(20px);
+        background: #18181b;
+        color: #ffffff;
+        padding: 10px 24px;
+        border-radius: 25.2px;
+        font-size: 13px;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        opacity: 0;
+        transition: opacity 0.3s, transform 0.3s;
+        pointer-events: none;
+        z-index: 9999;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ── About section ── */
+      .about-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        font-size: 13px;
+      }
+
+      .about-row:last-child {
+        margin-bottom: 0;
+      }
+
+      .about-key {
+        color: #858585;
+      }
+
+      .about-value {
+        color: #18181b;
+        font-weight: 500;
+      }
+
+      .about-value.mono {
+        font-family: Geist Mono, ui-monospace, monospace;
+        font-size: 12px;
+        color: #525252;
+      }
+
+      .about-value a {
+        color: #2563ef;
+        text-decoration: none;
+        border-bottom: 1px solid transparent;
+        transition: border-color 0.15s;
+      }
+
+      .about-value a:hover {
+        border-bottom-color: #2563ef;
+      }
+
+      /* ── Top nav ── */
+      .top-nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 56px;
+        border-bottom: 1px solid #e5e5e5;
+        padding: 0 16px;
+        position: relative;
+        background: #ffffff;
+      }
+
+      .top-nav-logo {
+        position: absolute;
+        left: 16px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #18181b;
+        text-decoration: none;
+        letter-spacing: -0.012em;
+      }
+
+      .top-nav-logo:hover {
+        color: #2563ef;
+      }
+
+      .top-nav-center {
+        font-size: 14px;
+        font-weight: 600;
+        color: #18181b;
+        letter-spacing: -0.012em;
+      }
+
+      .top-nav-right {
+        position: absolute;
+        right: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .nav-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 32px;
+        padding: 0 12px;
+        border: 1px solid #e5e5e5;
+        border-radius: 25.2px;
+        background: transparent;
+        color: #18181b;
+        font-family: Geist, ui-sans-serif, sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.15s;
+      }
+
+      .nav-btn:hover {
+        border-color: #18181b;
+      }
+
+      .nav-icon-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: 1px solid #e5e5e5;
+        border-radius: 25.2px;
+        background: transparent;
+        color: #858585;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+
+      .nav-icon-btn:hover {
+        border-color: #18181b;
+        color: #18181b;
+      }
+
+      /* ── Content container ── */
+      .content-wrap {
+        max-width: 640px;
+        margin: 0 auto;
+        padding: 24px 16px 40px;
+      }
+
+      .save-wrap {
+        margin-top: 24px;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+      <!-- ════════ TOP NAV ════════ -->
+      <nav class="top-nav">
+        <a href="login.html" class="top-nav-logo">AI FDE 助手</a>
+        <span class="top-nav-center">设置</span>
+        <div class="top-nav-right">
+          <a href="#" data-dom-id="back-home" class="nav-btn">
+            <i data-lucide="arrow-left" style="width:14px;height:14px;"></i>
+            返回
+          </a>
+          <button data-dom-id="open-notifications" class="nav-icon-btn" aria-label="通知">
+            <i data-lucide="bell" style="width:16px;height:16px;"></i>
+          </button>
+        </div>
+      </nav>
+
+      <!-- ════════ CONTENT ════════ -->
+      <div class="content-wrap">
+
+        <!-- ── Section 1: AI 大模型配置 ── -->
+        <div class="settings-card">
+          <div class="settings-card-title">AI 大模型配置</div>
+
+          <div class="field-row">
+            <label class="field-label" for="provider">服务商</label>
+            <select id="provider" class="settings-select">
+              <option value="openai">OpenAI</option>
+              <option value="anthropic">Anthropic Claude</option>
+              <option value="google">Google Gemini</option>
+              <option value="baidu">百度文心</option>
+              <option value="aliyun">阿里通义</option>
+              <option value="custom">自定义</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="model-name">模型名称</label>
+            <input id="model-name" type="text" class="settings-input" value="gpt-4o">
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="api-base">API Base URL</label>
+            <input id="api-base" type="text" class="settings-input mono" value="https://api.openai.com/v1">
+          </div>
+
+          <div class="field-row">
+            <label class="field-label" for="api-key">API Key</label>
+            <div class="password-wrapper">
+              <input id="api-key" type="password" class="settings-input" placeholder="sk-..." value="">
+              <button type="button" class="password-toggle" aria-label="显示/隐藏密钥" onclick="togglePassword()">
+                <i data-lucide="eye" id="eye-icon" style="width:16px;height:16px;"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <button class="btn-outline-blue" onclick="testConnection()">
+              <i data-lucide="zap" style="width:14px;height:14px;"></i>
+              测试连接
+            </button>
+            <div id="test-result" class="test-result">连接成功</div>
+          </div>
+        </div>
+
+        <!-- ── Section 2: 观察偏好 ── -->
+        <div class="settings-card">
+          <div class="settings-card-title">观察偏好</div>
+
+          <div class="field-row">
+            <label class="field-label" for="duration">默认观察周期</label>
+            <select id="duration" class="settings-select">
+              <option value="1">1天</option>
+              <option value="3">3天</option>
+              <option value="5" selected>5天</option>
+              <option value="7">7天</option>
+            </select>
+          </div>
+
+          <div class="toggle-row">
+            <span class="toggle-label">自动开始观察</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="auto-start">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <span class="toggle-label">观察超时提醒</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="timeout-alert" checked>
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- ── Section 3: 数据管理 ── -->
+        <div class="settings-card">
+          <div class="settings-card-title">数据管理</div>
+
+          <div class="field-row">
+            <label class="field-label" for="retention">数据保留时间</label>
+            <select id="retention" class="settings-select">
+              <option value="7">7天</option>
+              <option value="14">14天</option>
+              <option value="30" selected>30天</option>
+              <option value="never">永不删除</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <button class="btn-danger-link" id="clear-data-btn" onclick="showClearConfirm()">清除所有数据</button>
+            <div class="confirm-inline" id="clear-confirm">
+              <span>确定？</span>
+              <button class="btn-confirm-yes" onclick="confirmClear()">确定</button>
+              <button class="btn-confirm-no" onclick="hideClearConfirm()">取消</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Section 4: 关于 ── -->
+        <div class="settings-card">
+          <div class="settings-card-title">关于</div>
+
+          <div class="about-row">
+            <span class="about-key">版本</span>
+            <span class="about-value">v2.1.0</span>
+          </div>
+          <div class="about-row">
+            <span class="about-key">存储路径</span>
+            <span class="about-value mono">C:\Users\Admin\AppData\Local\ai-fde\data</span>
+          </div>
+          <div class="about-row">
+            <span class="about-key">许可证</span>
+            <span class="about-value"><a href="#">查看许可证</a></span>
+          </div>
+        </div>
+
+        <!-- ── Save Button ── -->
+        <div class="save-wrap">
+          <button class="btn-filled-blue" onclick="saveSettings()">保存设置</button>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">已保存</div>
+
+    <script>
+      // Initialize Lucide icons
+      lucide.createIcons();
+
+      // ── Toggle password visibility ──
+      function togglePassword() {
+        const input = document.getElementById('api-key');
+        const icon = document.getElementById('eye-icon');
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+          input.type = 'password';
+          icon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons();
+      }
+
+      // ── Test connection ──
+      function testConnection() {
+        const result = document.getElementById('test-result');
+        result.classList.add('active');
+        setTimeout(() => {
+          result.classList.remove('active');
+        }, 3000);
+      }
+
+      // ── Clear data confirm ──
+      function showClearConfirm() {
+        document.getElementById('clear-confirm').classList.add('active');
+      }
+
+      function hideClearConfirm() {
+        document.getElementById('clear-confirm').classList.remove('active');
+      }
+
+      function confirmClear() {
+        hideClearConfirm();
+        // Data clearing logic would go here
+      }
+
+      // ── Save settings with toast ──
+      function saveSettings() {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => {
+          toast.classList.remove('show');
+        }, 2000);
+      }
+    </script>
+</body>
+</html>

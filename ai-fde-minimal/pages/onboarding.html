@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI FDE 助手 — 新手引导</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── Design tokens (AI FDE blue accent override) ───────────── */
+:root {
+  --accent: #2563ef;
+  --accent-light: rgba(37,99,239,.08);
+  --accent-foreground: #ffffff;
+  --bg: #ffffff;
+  --bg-muted: #f5f5f5;
+  --text-primary: #18181b;
+  --text-muted: #858585;
+  --border: #e5e5e5;
+  --error: #cf001c;
+  --success: #16a34a;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'DM Serif Display', ui-serif, serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --radius: 25.2px;
+  --radius-sm: 12px;
+  --space-4: 4px;
+  --shadow: none;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ─────────────────────────────────────────────────── */
+.shell { display: flex; min-height: 100vh; }
+
+/* Left sidebar */
+.sidebar-left {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--bg-muted);
+  border-right: 1px solid var(--border);
+  padding: calc(var(--space-4) * 6);
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-4) * 5);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 2);
+  font-weight: 600;
+  font-size: .9375rem;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.sidebar-logo .logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--accent);
+  color: var(--accent-foreground);
+  display: grid;
+  place-items: center;
+  font-size: .75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.section-label {
+  font-size: .6875rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: calc(var(--space-4) * 2);
+}
+
+.progress-list { display: flex; flex-direction: column; gap: calc(var(--space-4) * 3); }
+.progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-4) * 1.5);
+}
+.progress-item .item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .8125rem;
+}
+.progress-item .item-header strong { font-weight: 500; }
+.progress-item .item-header span { font-size: .75rem; color: var(--text-muted); }
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+.progress-bar .fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  transition: width .3s ease;
+}
+.progress-bar .fill.blue { background: var(--accent); }
+.progress-bar .fill.gray { background: #c5c5c5; }
+
+.sidebar-divider {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+.security-list { display: flex; flex-direction: column; gap: calc(var(--space-4) * 2); }
+.security-item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 2);
+  font-size: .8125rem;
+  color: var(--text-muted);
+}
+.security-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.security-icon span[data-icon] {
+  width: 14px;
+  height: 14px;
+  display: inline-block;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  background: var(--text-muted);
+}
+
+/* Right column */
+.main-right {
+  flex: 1;
+  min-width: 0;
+  padding: calc(var(--space-4) * 6) calc(var(--space-4) * 8);
+  overflow-y: auto;
+}
+
+/* Topbar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: calc(var(--space-4) * 5);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: calc(var(--space-4) * 6);
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 3);
+}
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 1.5);
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: color .15s;
+}
+.back-btn:hover { color: var(--text-primary); }
+.back-btn svg { flex-shrink: 0; }
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 2);
+}
+.bell-btn {
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color .15s;
+  color: var(--text-muted);
+}
+.bell-btn:hover { border-color: var(--accent); }
+.bell-btn svg { width: 16px; height: 16px; }
+
+/* Step indicator */
+.step-indicator {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 3);
+  margin-bottom: calc(var(--space-4) * 6);
+}
+.step-number {
+  font-family: var(--font-mono);
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.step-number.active { color: var(--accent); }
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.step-line .fill {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+  transition: width .4s ease;
+}
+
+/* Steps container */
+.step-panel { display: none; }
+.step-panel.active { display: block; animation: fadeUp .3s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Step title */
+.step-title {
+  font-family: var(--font-serif);
+  font-size: 1.75rem;
+  line-height: 1.2;
+  letter-spacing: -.01em;
+  margin-bottom: calc(var(--space-4) * 6);
+}
+
+/* Career tags */
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--space-4) * 2);
+  margin-bottom: calc(var(--space-4) * 5);
+}
+.career-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: calc(var(--space-4) * 2) calc(var(--space-4) * 4);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all .15s ease;
+  user-select: none;
+}
+.career-tag:hover { border-color: var(--accent); color: var(--text-primary); }
+.career-tag.selected {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+
+/* Custom input (underline style) */
+.underline-input {
+  width: 100%;
+  max-width: 360px;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  padding: calc(var(--space-4) * 2) 0;
+  font: 500 .875rem/1.5 var(--font-sans);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color .15s;
+}
+.underline-input::placeholder { color: #c0c0c0; }
+.underline-input:focus { border-bottom-color: var(--accent); }
+
+/* Card (border only, white bg) */
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: calc(var(--space-4) * 5);
+  margin-bottom: calc(var(--space-4) * 4);
+}
+.card-title {
+  font-size: .9375rem;
+  font-weight: 600;
+  margin-bottom: calc(var(--space-4) * 4);
+  letter-spacing: -.008em;
+}
+
+/* Two-column grid inside card */
+.card-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--space-4) * 6);
+  margin-bottom: calc(var(--space-4) * 4);
+}
+.card-two-col .col-label {
+  font-size: .6875rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: calc(var(--space-4) * 2);
+}
+.card-two-col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--space-4) * 1.5);
+}
+.card-two-col li {
+  font-size: .8125rem;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 1.5);
+}
+.card-two-col li::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+}
+.work-style-text {
+  font-size: .8125rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+
+/* App scan card */
+.app-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: calc(var(--space-4) * 2.5);
+}
+.app-item {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-4) * 2);
+  font-size: .8125rem;
+  padding: calc(var(--space-4) * 2) calc(var(--space-4) * 3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.app-item:hover { border-color: var(--accent); }
+.app-item.checked { border-color: var(--accent); background: var(--accent-light); }
+.app-checkbox {
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 4px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  transition: all .15s;
+}
+.app-item.checked .app-checkbox {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.app-item.checked .app-checkbox svg { display: block; }
+.app-item .app-checkbox svg { display: none; width: 10px; height: 10px; color: white; }
+.app-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.app-name { font-weight: 500; }
+.app-category { font-size: .6875rem; color: var(--text-muted); }
+.rescan-btn {
+  margin-top: calc(var(--space-4) * 3);
+  font-size: .8125rem;
+  font-weight: 500;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity .15s;
+}
+.rescan-btn:hover { opacity: .7; }
+
+/* Step nav buttons */
+.step-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(var(--space-4) * 3);
+  margin-top: calc(var(--space-4) * 6);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space-4) * 1.5);
+  height: 36px;
+  padding: 0 calc(var(--space-4) * 5);
+  border-radius: 999px;
+  font: 600 .8125rem/1 var(--font-sans);
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+  border: 1px solid transparent;
+}
+.btn:active { transform: scale(.98); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-outlined {
+  background: var(--bg);
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+.btn-outlined:hover { background: var(--bg-muted); }
+.btn-filled {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+.btn-filled:hover { filter: brightness(.96); }
+
+/* Duration buttons */
+.duration-row {
+  display: flex;
+  gap: calc(var(--space-4) * 2);
+  margin-bottom: calc(var(--space-4) * 5);
+}
+.duration-btn {
+  width: 56px;
+  height: 40px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font: 600 .875rem/1 var(--font-mono);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all .15s ease;
+  display: grid;
+  place-items: center;
+}
+.duration-btn:hover { border-color: var(--accent); }
+.duration-btn.selected {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+
+/* Calendar grid */
+.calendar-section { margin-bottom: calc(var(--space-4) * 5); }
+.calendar-label {
+  font-size: .6875rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: calc(var(--space-4) * 3);
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: calc(var(--space-4) * 1.5);
+}
+.calendar-header {
+  font-size: .6875rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: calc(var(--space-4) * 1.5) 0;
+}
+.calendar-day {
+  aspect-ratio: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  display: grid;
+  place-items: center;
+  font: 500 .75rem/1 var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg);
+  transition: all .15s ease;
+}
+.calendar-day.active {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+
+/* Password inputs */
+.password-row {
+  display: flex;
+  gap: calc(var(--space-4) * 4);
+  margin-bottom: calc(var(--space-4) * 4);
+}
+.password-group {
+  flex: 1;
+  max-width: 240px;
+}
+.password-label {
+  font-size: .6875rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-bottom: calc(var(--space-4) * 2);
+}
+
+/* Summary card */
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--space-4) * 3) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .8125rem;
+}
+.summary-row:last-child { border-bottom: none; }
+.summary-row .label { color: var(--text-muted); }
+.summary-row .value { font-weight: 600; }
+
+/* Warning notice */
+.warning-notice {
+  padding: calc(var(--space-4) * 3) calc(var(--space-4) * 4);
+  border-left: 3px solid var(--error);
+  background: #fff5f5;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: .8125rem;
+  color: #7a1a1a;
+  margin-bottom: calc(var(--space-4) * 5);
+  line-height: 1.6;
+}
+
+/* Icons helper */
+.icon-inline {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  color: currentColor;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .sidebar-left { display: none; }
+  .card-two-col { grid-template-columns: 1fr; }
+  .password-row { flex-direction: column; }
+  .password-group { max-width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ═══ LEFT SIDEBAR ═══ -->
+  <aside class="sidebar-left">
+    <a class="sidebar-logo" data-dom-id="back-home" href="#">
+      <span class="logo-mark">F</span>
+      AI FDE 助手
+    </a>
+
+    <div>
+      <div class="section-label">观察进度</div>
+      <div class="progress-list">
+        <div class="progress-item">
+          <div class="item-header">
+            <strong>客户信息搬运助手</strong>
+            <span>第 2 天 / 3 天</span>
+          </div>
+          <div class="progress-bar"><span class="fill blue" style="width:65%"></span></div>
+        </div>
+        <div class="progress-item">
+          <div class="item-header">
+            <strong>库存状态问答 Agent</strong>
+            <span>已完成</span>
+          </div>
+          <div class="progress-bar"><span class="fill gray" style="width:100%"></span></div>
+        </div>
+        <div class="progress-item">
+          <div class="item-header">
+            <strong>自动日报助手</strong>
+            <span>已暂停</span>
+          </div>
+          <div class="progress-bar"><span class="fill gray" style="width:30%"></span></div>
+        </div>
+        <div class="progress-item">
+          <div class="item-header">
+            <strong>报价单生成工作流</strong>
+            <span>待开始</span>
+          </div>
+          <div class="progress-bar"><span class="fill gray" style="width:0%"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="sidebar-divider">
+
+    <div>
+      <div class="section-label">安全保障</div>
+      <div class="security-list">
+        <div class="security-item">
+          <div class="security-icon">
+            <span data-icon="lock" style="-webkit-mask-image:url('../assets/icons/dl_builtin_minimalist/lock.svg');mask-image:url('../assets/icons/dl_builtin_minimalist/lock.svg');"></span>
+          </div>
+          AES-256 加密
+        </div>
+        <div class="security-item">
+          <div class="security-icon">
+            <span data-icon="folder" style="-webkit-mask-image:url('../assets/icons/dl_builtin_minimalist/folder.svg');mask-image:url('../assets/icons/dl_builtin_minimalist/folder.svg');"></span>
+          </div>
+          仅本地处理
+        </div>
+        <div class="security-item">
+          <div class="security-icon">
+            <span data-icon="trash-2" style="-webkit-mask-image:url('../assets/icons/dl_builtin_minimalist/trash-2.svg');mask-image:url('../assets/icons/dl_builtin_minimalist/trash-2.svg');"></span>
+          </div>
+          到期销毁
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ RIGHT COLUMN ═══ -->
+  <main class="main-right">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="back-btn" onclick="history.back()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          返回
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="bell-btn" data-dom-id="open-notifications" aria-label="通知">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+      <span class="step-number active" id="stepLabel01">01 / 03</span>
+      <div class="step-line"><span class="fill" id="stepLineFill" style="width:0%"></span></div>
+    </div>
+
+    <!-- ═══════════ STEP 1 — 职业识别 ═══════════ -->
+    <div class="step-panel active" id="step1">
+      <h2 class="step-title">职业识别</h2>
+
+      <!-- Career tags -->
+      <div class="tag-row" id="careerTags">
+        <span class="career-tag selected" data-career="销售经理" onclick="toggleCareer(this)">销售经理</span>
+        <span class="career-tag" data-career="产品运营" onclick="toggleCareer(this)">产品运营</span>
+        <span class="career-tag" data-career="财务会计" onclick="toggleCareer(this)">财务会计</span>
+        <span class="career-tag" data-career="软件工程师" onclick="toggleCareer(this)">软件工程师</span>
+        <span class="career-tag" data-career="人力资源" onclick="toggleCareer(this)">人力资源</span>
+        <span class="career-tag" data-career="市场推广" onclick="toggleCareer(this)">市场推广</span>
+        <span class="career-tag" data-career="项目管理" onclick="toggleCareer(this)">项目管理</span>
+      </div>
+
+      <!-- Custom input -->
+      <div style="margin-bottom:calc(var(--space-4) * 6)">
+        <input class="underline-input" type="text" placeholder="输入你的职业..." id="customCareerInput" aria-label="自定义职业">
+      </div>
+
+      <!-- AI result card -->
+      <div class="card">
+        <div class="card-title">AI 识别结果</div>
+        <div class="card-two-col">
+          <div>
+            <div class="col-label">工作范围</div>
+            <ul>
+              <li>客户管理</li>
+              <li>报价审批</li>
+              <li>合同跟进</li>
+              <li>数据报表</li>
+            </ul>
+          </div>
+          <div>
+            <div class="col-label">常用工具</div>
+            <ul>
+              <li>CRM</li>
+              <li>Excel</li>
+              <li>邮件</li>
+              <li>即时通讯</li>
+            </ul>
+          </div>
+        </div>
+        <div class="work-style-text">
+          根据你选择的职业，AI 将重点观察客户沟通、报价流程与合同管理相关操作，帮助自动识别高频工作模式，从而更精准地为你生成定制化助手。
+        </div>
+      </div>
+
+      <!-- App scan card -->
+      <div class="card">
+        <div class="card-title">扫描本机应用</div>
+        <div class="app-grid" id="appGrid">
+          <div class="app-item checked" data-app="Excel" data-category="办公" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">Excel</span><span class="app-category">办公</span></div>
+          </div>
+          <div class="app-item checked" data-app="Word" data-category="办公" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">Word</span><span class="app-category">办公</span></div>
+          </div>
+          <div class="app-item checked" data-app="浏览器" data-category="工具" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">浏览器</span><span class="app-category">工具</span></div>
+          </div>
+          <div class="app-item checked" data-app="CRM" data-category="业务" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">CRM</span><span class="app-category">业务</span></div>
+          </div>
+          <div class="app-item checked" data-app="邮件" data-category="通讯" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">邮件</span><span class="app-category">通讯</span></div>
+          </div>
+          <div class="app-item" data-app="PPT" data-category="办公" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">PPT</span><span class="app-category">办公</span></div>
+          </div>
+          <div class="app-item" data-app="微信" data-category="通讯" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">微信</span><span class="app-category">通讯</span></div>
+          </div>
+          <div class="app-item" data-app="钉钉" data-category="通讯" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">钉钉</span><span class="app-category">通讯</span></div>
+          </div>
+          <div class="app-item" data-app="飞书" data-category="协作" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">飞书</span><span class="app-category">协作</span></div>
+          </div>
+          <div class="app-item" data-app="Notion" data-category="笔记" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">Notion</span><span class="app-category">笔记</span></div>
+          </div>
+          <div class="app-item" data-app="ERP" data-category="业务" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">ERP</span><span class="app-category">业务</span></div>
+          </div>
+          <div class="app-item" data-app="PDF阅读器" data-category="工具" onclick="toggleApp(this)">
+            <div class="app-checkbox"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="app-info"><span class="app-name">PDF阅读器</span><span class="app-category">工具</span></div>
+          </div>
+        </div>
+        <button class="rescan-btn">重新扫描</button>
+      </div>
+
+      <!-- Step 1 action -->
+      <div class="step-actions">
+        <button class="btn btn-filled" onclick="goToStep(2)">下一步</button>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 2 — 观察范围 ═══════════ -->
+    <div class="step-panel" id="step2">
+      <h2 class="step-title">观察范围</h2>
+
+      <!-- Duration buttons -->
+      <div>
+        <div class="calendar-label">观察时长</div>
+        <div class="duration-row" id="durationRow">
+          <button class="duration-btn" data-days="1" onclick="selectDuration(this)">1</button>
+          <button class="duration-btn selected" data-days="3" onclick="selectDuration(this)">3</button>
+          <button class="duration-btn selected" data-days="5" onclick="selectDuration(this)">5</button>
+          <button class="duration-btn selected" data-days="7" onclick="selectDuration(this)">7</button>
+        </div>
+      </div>
+
+      <!-- Calendar grid -->
+      <div class="calendar-section">
+        <div class="calendar-label">观察日历</div>
+        <div class="calendar-grid" id="calendarGrid">
+          <div class="calendar-header">一</div>
+          <div class="calendar-header">二</div>
+          <div class="calendar-header">三</div>
+          <div class="calendar-header">四</div>
+          <div class="calendar-header">五</div>
+          <div class="calendar-header">六</div>
+          <div class="calendar-header">日</div>
+          <!-- Days will be filled by JS -->
+        </div>
+      </div>
+
+      <!-- Password inputs -->
+      <div>
+        <div class="calendar-label">安全密码</div>
+        <div class="password-row">
+          <div class="password-group">
+            <div class="password-label">设置密码</div>
+            <input class="underline-input" type="password" placeholder="输入密码..." id="passwordInput" aria-label="设置密码">
+          </div>
+          <div class="password-group">
+            <div class="password-label">确认密码</div>
+            <input class="underline-input" type="password" placeholder="再次输入..." id="passwordConfirm" aria-label="确认密码">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 actions -->
+      <div class="step-actions">
+        <button class="btn btn-outlined" onclick="goToStep(1)">上一步</button>
+        <button class="btn btn-filled" onclick="goToStep(3)">下一步：开始观察</button>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 3 — 开始观察 ═══════════ -->
+    <div class="step-panel" id="step3">
+      <h2 class="step-title">开始观察</h2>
+
+      <!-- Summary card -->
+      <div class="card">
+        <div class="card-title">配置摘要</div>
+        <div class="summary-row">
+          <span class="label">职业</span>
+          <span class="value" id="summaryCareer">销售经理</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">应用</span>
+          <span class="value" id="summaryApps">Excel, Word, 浏览器, CRM, 邮件</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">时长</span>
+          <span class="value" id="summaryDuration">15 天</span>
+        </div>
+        <div class="summary-row">
+          <span class="label">密码</span>
+          <span class="value" id="summaryPassword">已设置</span>
+        </div>
+      </div>
+
+      <!-- Warning notice -->
+      <div class="warning-notice">
+        观察期间，AI 将在后台静默记录你在选中应用中的操作模式。所有数据均使用 AES-256 加密存储于本地，到期后将自动销毁。请确保在此期间不要修改或卸载所选应用程序。
+      </div>
+
+      <!-- Step 3 action -->
+      <div class="step-actions">
+        <button class="btn btn-outlined" onclick="goToStep(2)">上一步</button>
+        <button class="btn btn-filled" data-dom-id="start-observation" onclick="startObservation()">开始观察</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  /* ── State ────────────────────────────────────────────────── */
+  let currentStep = 1;
+  let selectedDays = [3, 5, 7]; // default selected
+
+  /* ── Step navigation ─────────────────────────────────────── */
+  function goToStep(step) {
+    currentStep = step;
+
+    // Hide all panels, show target
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+
+    // Update indicator
+    const label = document.getElementById('stepLabel01');
+    const fill = document.getElementById('stepLineFill');
+    label.textContent = '0' + step + ' / 03';
+
+    // Color the step number
+    document.querySelectorAll('.step-number').forEach(n => n.classList.add('active'));
+
+    // Progress line: 0% step1, 50% step2, 100% step3
+    const pct = (step - 1) * 50;
+    fill.style.width = pct + '%';
+
+    // Auto-fill summary on step 3
+    if (step === 3) fillSummary();
+
+    // Scroll to top
+    document.querySelector('.main-right').scrollTop = 0;
+  }
+
+  /* ── Career tag toggle ───────────────────────────────────── */
+  function toggleCareer(el) {
+    el.classList.toggle('selected');
+  }
+
+  /* ── App checkbox toggle ─────────────────────────────────── */
+  function toggleApp(el) {
+    el.classList.toggle('checked');
+  }
+
+  /* ── Duration select ────────────────────────────────────── */
+  function selectDuration(el) {
+    const days = parseInt(el.dataset.days);
+    if (el.classList.contains('selected')) {
+      el.classList.remove('selected');
+      selectedDays = selectedDays.filter(d => d !== days);
+    } else {
+      el.classList.add('selected');
+      selectedDays.push(days);
+    }
+    selectedDays.sort((a, b) => a - b);
+    updateCalendar();
+  }
+
+  /* ── Calendar update ──────────────────────────────────────── */
+  function updateCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    // Remove old day cells (keep headers)
+    grid.querySelectorAll('.calendar-day').forEach(d => d.remove());
+
+    const startDate = new Date(2026, 5, 27); // Today: June 27, 2026
+    // Build 35 day cells (5 weeks)
+    // Get the Monday of the current week
+    const dayOfWeek = startDate.getDay(); // 0=Sun, 1=Mon...
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(startDate);
+    monday.setDate(monday.getDate() + mondayOffset);
+
+    for (let i = 0; i < 35; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+
+      const cell = document.createElement('div');
+      cell.className = 'calendar-day';
+      cell.textContent = d.getDate();
+
+      // Determine if this day is within any selected observation window
+      let isActive = false;
+      for (const dur of selectedDays) {
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + dur - 1);
+        if (d >= startDate && d <= endDate) {
+          isActive = true;
+          break;
+        }
+      }
+      if (isActive) cell.classList.add('active');
+
+      grid.appendChild(cell);
+    }
+  }
+
+  /* ── Summary auto-fill ───────────────────────────────────── */
+  function fillSummary() {
+    // Career
+    const careers = [];
+    document.querySelectorAll('.career-tag.selected').forEach(t => careers.push(t.dataset.career));
+    const customInput = document.getElementById('customCareerInput').value.trim();
+    if (customInput) careers.unshift(customInput);
+    document.getElementById('summaryCareer').textContent = careers.length > 0 ? careers.join('、') : '未选择';
+
+    // Apps
+    const apps = [];
+    document.querySelectorAll('.app-item.checked').forEach(a => apps.push(a.dataset.app));
+    document.getElementById('summaryApps').textContent = apps.length > 0 ? apps.join(', ') : '未选择';
+
+    // Duration
+    if (selectedDays.length > 0) {
+      const maxDays = Math.max(...selectedDays);
+      document.getElementById('summaryDuration').textContent = maxDays + ' 天';
+    } else {
+      document.getElementById('summaryDuration').textContent = '未选择';
+    }
+
+    // Password
+    const pw = document.getElementById('passwordInput').value;
+    const pwc = document.getElementById('passwordConfirm').value;
+    if (pw && pw === pwc) {
+      document.getElementById('summaryPassword').textContent = '已设置';
+    } else if (pw || pwc) {
+      document.getElementById('summaryPassword').textContent = '密码不一致';
+      document.getElementById('summaryPassword').style.color = 'var(--error)';
+    } else {
+      document.getElementById('summaryPassword').textContent = '未设置';
+      document.getElementById('summaryPassword').style.color = '';
+    }
+  }
+
+  /* ── Start observation ───────────────────────────────────── */
+  function startObservation() {
+    fillSummary();
+    // Placeholder — integrate with backend
+    alert('观察已开始！AI 将在后台静默运行。');
+  }
+
+  /* ── Init ─────────────────────────────────────────────────── */
+  updateCalendar();
+</script>
+
+</body>
+</html>

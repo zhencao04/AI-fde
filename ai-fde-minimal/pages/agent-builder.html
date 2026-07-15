@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI FDE 助手 - Agent 原型构建器</title>
+    <style id="theme-vars">
+:root {
+  --accent: #2563ef;
+  --accent-light: rgba(37,99,239,.08);
+  --accent-foreground: #ffffff;
+  --bg: #ffffff;
+  --bg-muted: #f5f5f5;
+  --text-primary: #18181b;
+  --text-muted: #858585;
+  --border: #e5e5e5;
+  --error: #cf001c;
+  --success: #16a34a;
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'DM Serif Display', ui-serif, serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --radius: 25.2px;
+  --radius-sm: 12px;
+  --space-4: 4px;
+  --shadow: none;
+  --brand-900: #18181b;
+  --brand-500: #71717a;
+  --brand-200: #e4e4e7;
+  --brand-100: #f4f4f5;
+  --brand-50: #fafafa;
+  --background: #ffffff;
+  --card: #ffffff;
+  --foreground: #18181b;
+  --muted-foreground: #858585;
+}
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-accent: #2563ef;
+    --color-accent-light: rgba(37,99,239,.08);
+    --color-accent-foreground: #ffffff;
+    --color-bg: #ffffff;
+    --color-bg-muted: #f5f5f5;
+    --color-text-primary: #18181b;
+    --color-text-muted: #858585;
+    --color-border: #e5e5e5;
+    --color-error: #cf001c;
+    --color-success: #16a34a;
+  }
+  @layer base {
+    body {
+      background: #ffffff;
+      color: #18181b;
+      font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+      box-shadow: none;
+    }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+      body {
+        font-family: 'Geist', ui-sans-serif, system-ui, sans-serif;
+        background: #ffffff;
+        color: #18181b;
+        box-shadow: none;
+      }
+
+      .font-serif { font-family: 'DM Serif Display', ui-serif, serif; }
+      .font-mono { font-family: 'Geist Mono', ui-monospace, monospace; }
+
+      /* Workflow flow nodes */
+      .flow-node {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 16px;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        background: #ffffff;
+        color: #18181b;
+        position: relative;
+      }
+      .flow-node.accent {
+        border-color: #2563ef;
+        color: #2563ef;
+        background: rgba(37,99,239,.04);
+      }
+
+      .flow-arrow {
+        flex-shrink: 0;
+        width: 32px;
+        height: 1px;
+        background: #e5e5e5;
+        position: relative;
+      }
+      .flow-arrow::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: -3px;
+        border-left: 6px solid #e5e5e5;
+        border-top: 3.5px solid transparent;
+        border-bottom: 3.5px solid transparent;
+      }
+
+      /* Guardrail items */
+      .guardrail-item {
+        border-left: 3px solid #2563ef;
+        padding-left: 12px;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        color: #18181b;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      /* Code block syntax */
+      .code-block {
+        background: #18181b;
+        color: #e5e5e5;
+        border-radius: 16px;
+        padding: 24px;
+        font-family: 'Geist Mono', ui-monospace, monospace;
+        font-size: 13px;
+        line-height: 1.7;
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .code-block .heading { color: #2563ef; }
+      .code-block .comment { color: #858585; }
+      .code-block .normal { color: #e5e5e5; }
+
+      /* Badge styles */
+      .badge-error {
+        background: #cf001c;
+        color: #ffffff;
+        padding: 4px 12px;
+        border-radius: 25.2px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .badge-accent {
+        background: rgba(37,99,239,.1);
+        color: #2563ef;
+        padding: 4px 12px;
+        border-radius: 25.2px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      /* Card base */
+      .card-base {
+        border: 1px solid #e5e5e5;
+        border-radius: 25.2px;
+        padding: 24px;
+        background: #ffffff;
+        box-shadow: none;
+      }
+
+      /* Perm item */
+      .perm-allowed { color: #16a34a; }
+      .perm-forbidden { color: #cf001c; }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main style="max-width: 1200px; margin: 0 auto; padding: 0 24px;">
+
+      <!-- ═══════════════ TOP NAV ═══════════════ -->
+      <nav style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #e5e5e5; gap: 16px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0;">
+          <span style="font-family: 'DM Serif Display', serif; font-size: 18px; color: #18181b; white-space: nowrap;">AI FDE 助手</span>
+          <button data-dom-id="back-home" onclick="history.back()" style="display: inline-flex; align-items: center; gap: 4px; padding: 6px 14px; border: 1px solid #e5e5e5; border-radius: 12px; background: #ffffff; color: #18181b; font-size: 13px; cursor: pointer; white-space: nowrap; font-family: 'Geist', sans-serif;">
+            <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i>
+            返回
+          </button>
+          <span style="color: #858585; font-size: 13px; white-space: nowrap;" class="font-mono">报告 &gt; 客户信息搬运助手</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <a href="opportunity-report.html" style="font-size: 13px; color: #858585; text-decoration: none; white-space: nowrap; border: 1px solid #e5e5e5; padding: 6px 14px; border-radius: 12px;">返回报告</a>
+          <button data-dom-id="open-notifications" style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid #e5e5e5; border-radius: 12px; background: #ffffff; color: #18181b; cursor: pointer;">
+            <i data-lucide="bell" style="width: 16px; height: 16px;"></i>
+          </button>
+        </div>
+      </nav>
+
+      <!-- ═══════════════ HEADER ═══════════════ -->
+      <section style="padding: 32px 0 24px 0;">
+        <h1 class="font-serif" style="font-size: 32px; color: #18181b; margin: 0 0 12px 0; line-height: 1.2;">客户信息搬运助手</h1>
+        <p class="font-mono" style="color: #858585; font-size: 13px; margin: 0 0 16px 0;">42 次重复操作 / CRM + 表格 + 邮件 / 每周节省 3.5h</p>
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <span class="badge-error">高优先级</span>
+          <span class="badge-accent">自动化潜力 92</span>
+        </div>
+      </section>
+
+      <!-- ═══════════════ TWO COLUMNS ═══════════════ -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding-bottom: 32px;">
+
+        <!-- LEFT COLUMN — Agent 定义 -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+
+          <!-- Card 1: 角色设定 -->
+          <div class="card-base">
+            <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0 0 16px 0;">角色设定</h3>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="display: flex; gap: 12px;">
+                <span style="color: #858585; font-size: 13px; min-width: 48px; flex-shrink: 0;">角色</span>
+                <span style="color: #18181b; font-size: 13px; line-height: 1.5;">负责在 CRM、报价单表格和邮件之间搬运客户基础信息的数据操作员</span>
+              </div>
+              <div style="display: flex; gap: 12px;">
+                <span style="color: #858585; font-size: 13px; min-width: 48px; flex-shrink: 0;">目标</span>
+                <span style="color: #18181b; font-size: 13px; line-height: 1.5;">自动从 CRM 系统提取客户名称、联系方式、项目信息，填充到报价单模板并生成邮件草稿</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: 权限白名单 -->
+          <div class="card-base">
+            <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0 0 16px 0;">权限白名单</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <i data-lucide="check" class="perm-allowed" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>CRM 系统读取（只读）</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <i data-lucide="check" class="perm-allowed" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>表格文件读取（只读）</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <i data-lucide="check" class="perm-allowed" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>LLM 文本生成</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <i data-lucide="x" class="perm-forbidden" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>邮件发送（需人工确认）</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <i data-lucide="x" class="perm-forbidden" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>CRM 数据写入</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px;">
+                <i data-lucide="x" class="perm-forbidden" style="width: 16px; height: 16px; flex-shrink: 0;"></i>
+                <span>删除任何记录</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: 护栏规则 -->
+          <div class="card-base">
+            <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0 0 16px 0;">护栏规则</h3>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <div class="guardrail-item">仅在授权应用范围内操作，不得访问 CRM 和表格以外的系统</div>
+              <div class="guardrail-item">不读取或传输客户敏感信息（身份证号、银行卡等）</div>
+              <div class="guardrail-item">所有输出内容在发送前必须校验模板变量完整性</div>
+              <div class="guardrail-item">连续失败 2 次后自动停止并通知用户介入</div>
+            </div>
+          </div>
+
+          <!-- Card 4: 失败回退 -->
+          <div class="card-base">
+            <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0 0 12px 0;">失败回退</h3>
+            <p style="color: #858585; font-size: 13px; line-height: 1.6; margin: 0;">当 Agent 在任意步骤失败时，保留已提取的数据快照，向用户推送失败通知并附带详细的错误日志，等待人工确认后可选择重试或手动接管流程。</p>
+          </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN — 工作流 & 提示词 -->
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+
+          <!-- Card: 工作流蓝图 -->
+          <div class="card-base">
+            <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0 0 20px 0;">工作流蓝图</h3>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; padding: 8px 0;">
+              <div class="flow-node accent">触发</div>
+              <div class="flow-arrow"></div>
+              <div class="flow-node">输入</div>
+              <div class="flow-arrow"></div>
+              <div class="flow-node">AI 判断</div>
+              <div class="flow-arrow"></div>
+              <div class="flow-node">工具</div>
+              <div class="flow-arrow"></div>
+              <div class="flow-node">确认</div>
+              <div class="flow-arrow"></div>
+              <div class="flow-node accent">输出</div>
+            </div>
+          </div>
+
+          <!-- Card: 提示词素材包 -->
+          <div class="card-base">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+              <h3 style="font-size: 15px; font-weight: 600; color: #18181b; margin: 0;">提示词素材包</h3>
+              <span style="font-size: 12px; color: #858585; background: #f5f5f5; padding: 4px 10px; border-radius: 12px;">复制到 AI 编程工具</span>
+            </div>
+
+            <div class="code-block"><span class="heading"># 角色：客户信息搬运助手</span>
+<span class="normal">目标：自动从 CRM 提取客户信息，
+填充到报价单和邮件草稿中。</span>
+
+<span class="heading">## 护栏</span>
+<span class="comment">- 仅在授权应用范围内操作
+- 不读取敏感内容
+- 输出前校验模板变量
+- 失败 2 次停止</span>
+
+<span class="heading">## 可用工具</span>
+<span class="comment">- CRM 读取（只读）
+- 表格读取（只读）
+- 邮件发送（需确认）
+- LLM 文本生成</span></div>
+
+            <div style="display: flex; gap: 10px; margin-top: 16px;">
+              <button data-dom-id="copy-prompt" onclick="
+                const codeBlock = document.querySelector('.code-block');
+                navigator.clipboard.writeText(codeBlock.innerText).then(() => {
+                  const btn = document.querySelector('[data-dom-id=copy-prompt]');
+                  btn.textContent = '已复制';
+                  setTimeout(() => { btn.textContent = '复制到剪贴板'; }, 2000);
+                });
+              " style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: #2563ef; color: #ffffff; border: none; border-radius: 12px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'Geist', sans-serif;">
+                <i data-lucide="copy" style="width: 14px; height: 14px;"></i>
+                复制到剪贴板
+              </button>
+              <a href="javascript:void(0)" onclick="
+                const codeBlock = document.querySelector('.code-block');
+                const blob = new Blob([codeBlock.innerText], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'agent-prompt.md';
+                a.click();
+                URL.revokeObjectURL(a.href);
+              " style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; background: #ffffff; color: #18181b; border: 1px solid #e5e5e5; border-radius: 12px; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: none; font-family: 'Geist', sans-serif;">
+                <i data-lucide="download" style="width: 14px; height: 14px;"></i>
+                下载
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════════════ BOTTOM CTA ═══════════════ -->
+      <div style="padding: 16px 0 40px 0; border-top: 1px solid #e5e5e5; display: flex; justify-content: center;">
+        <a href="opportunity-report.html" style="font-size: 14px; color: #858585; text-decoration: none; border: 1px solid #e5e5e5; padding: 10px 24px; border-radius: 25.2px; display: inline-flex; align-items: center; gap: 6px; transition: color 0.2s;">
+          返回报告，查看其他机会
+          <i data-lucide="arrow-right" style="width: 14px; height: 14px;"></i>
+        </a>
+      </div>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

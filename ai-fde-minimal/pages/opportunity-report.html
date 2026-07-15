@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 机会报告 — AI FDE 助手</title>
+    <style id="theme-vars">
+/* Source: structured-spec — monochrome minimalist palette (black/white/gray) */
+:root {
+  --brand-50: #fafafa;
+  --brand-100: #f4f4f5;
+  --brand-200: #e4e4e7;
+  --brand-300: #d4d4d8;
+  --brand-400: #a1a1aa;
+  --brand-500: #71717a;
+  --brand-600: #52525b;
+  --brand-700: #3f3f46;
+  --brand-800: #27272a;
+  --brand-900: #18181b;
+
+  --background-50: #ffffff;
+  --background-100: #fafafa;
+  --background-200: #f5f5f5;
+  --background-300: #e5e5e5;
+  --background-400: #d4d4d4;
+  --background-500: #a3a3a3;
+  --background-600: #404040;
+  --background-700: #262626;
+  --background-800: #171717;
+  --background-900: #0a0a0a;
+
+  --text-50: #fafafa;
+  --text-100: #ededed;
+  --text-200: #d4d4d4;
+  --text-300: #a1a1a1;
+  --text-400: #858585;
+  --text-500: #6e6e6e;
+  --text-600: #525252;
+  --text-700: #404040;
+  --text-800: #171717;
+  --text-900: #0a0a0a;
+
+  --icon-50: #fafafa;
+  --icon-100: #e5e5e5;
+  --icon-200: #d4d4d4;
+  --icon-300: #b0b0b0;
+  --icon-400: #8f8f8f;
+  --icon-500: #6e6e6e;
+  --icon-600: #525252;
+  --icon-700: #404040;
+  --icon-800: #262626;
+  --icon-900: #0a0a0a;
+
+  --background: var(--background-50);
+  --card: var(--background-50);
+  --popover: var(--background-50);
+  --muted: var(--background-100);
+
+  --foreground: var(--brand-900);
+  --card-foreground: var(--brand-900);
+  --popover-foreground: var(--brand-900);
+  --primary-foreground: var(--brand-50);
+  --secondary-foreground: var(--brand-900);
+  --muted-foreground: var(--brand-500);
+  --accent-foreground: var(--brand-900);
+  --destructive-foreground: var(--background-50);
+  --sidebar-foreground: var(--brand-900);
+  --sidebar-primary-foreground: var(--brand-50);
+  --sidebar-accent-foreground: var(--brand-900);
+
+  --primary: var(--brand-900);
+  --secondary: var(--brand-100);
+  --accent: var(--brand-100);
+  --input: var(--brand-200);
+  --ring: var(--brand-900);
+
+  --border: var(--brand-200);
+  --border-strong: var(--brand-300);
+
+  --success: #16a34a;
+  --success-foreground: var(--background-50);
+  --success-subtle: #f0fdf4;
+  --success-border: #bbf7d0;
+  --success-text: #15803d;
+
+  --destructive: #dc2626;
+  --destructive-subtle: #fef2f2;
+  --destructive-border: #fecaca;
+  --destructive-text: #b91c1c;
+
+  --brand-subtle: var(--brand-100);
+  --brand-border: var(--brand-300);
+
+  --chart-1: var(--brand-200);
+  --chart-2: var(--brand-400);
+  --chart-3: var(--brand-600);
+  --chart-4: var(--brand-800);
+  --chart-5: var(--brand-900);
+
+  --sidebar: var(--brand-50);
+  --sidebar-primary: var(--brand-900);
+  --sidebar-accent: var(--brand-100);
+  --sidebar-border: var(--brand-200);
+  --sidebar-ring: var(--brand-400);
+
+  --font-sans: Geist, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Serif Display, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --tracking-normal: 0em;
+  --tracking-tight: -0.012em;
+
+  --radius: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-lg: 1rem;
+
+  --shadow-2xs: 0 1px 0 0 rgba(0, 0, 0, 0.04);
+  --shadow-xs: 0 1px 1px 0 rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 1px 0 rgba(0, 0, 0, 0.03);
+  --shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 8px -2px rgba(0, 0, 0, 0.07), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 20px -6px rgba(0, 0, 0, 0.08), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 24px 40px -10px rgba(0, 0, 0, 0.10), 0 8px 16px -4px rgba(0, 0, 0, 0.06);
+  --shadow-2xl: 0 32px 56px -14px rgba(0, 0, 0, 0.14);
+
+  --spacing: 0.25rem;
+
+  --color-surface: var(--background);
+  --color-surface-muted: var(--muted);
+  --color-text: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-brand: var(--primary);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-border: var(--brand-border);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-success-50: var(--success-subtle);
+  --color-success-200: var(--success-border);
+  --color-success-600: var(--success);
+  --color-success-700: var(--success-text);
+  --color-danger-50: var(--destructive-subtle);
+  --color-danger-200: var(--destructive-border);
+  --color-danger-600: var(--destructive);
+  --color-danger-700: var(--destructive-text);
+  --space-4: var(--spacing);
+  --radius-md: var(--radius);
+}
+
+.dark {
+  --background: var(--brand-900);
+  --card: var(--brand-800);
+  --popover: var(--brand-800);
+  --muted: var(--brand-800);
+
+  --foreground: var(--brand-50);
+  --card-foreground: var(--brand-50);
+  --popover-foreground: var(--brand-50);
+  --primary-foreground: var(--brand-900);
+  --secondary-foreground: var(--brand-50);
+  --muted-foreground: var(--brand-400);
+  --accent-foreground: var(--brand-50);
+  --destructive-foreground: var(--brand-50);
+  --sidebar-foreground: var(--brand-50);
+  --sidebar-primary-foreground: var(--brand-900);
+  --sidebar-accent-foreground: var(--brand-50);
+
+  --primary: var(--brand-50);
+  --secondary: var(--brand-800);
+  --accent: var(--brand-700);
+  --input: var(--brand-700);
+  --ring: var(--brand-300);
+
+  --border: var(--brand-700);
+  --border-strong: var(--brand-600);
+
+  --success: #22c55e;
+  --success-foreground: #052e16;
+  --success-subtle: #0f2417;
+  --success-border: #166534;
+  --success-text: #4ade80;
+
+  --destructive: #ef4444;
+  --destructive-subtle: #2a1416;
+  --destructive-border: #7f1d1d;
+  --destructive-text: #fca5a5;
+
+  --brand-subtle: var(--brand-800);
+  --brand-border: var(--brand-700);
+
+  --chart-1: var(--brand-700);
+  --chart-2: var(--brand-500);
+  --chart-3: var(--brand-300);
+  --chart-4: var(--brand-200);
+  --chart-5: var(--brand-50);
+
+  --sidebar: var(--brand-800);
+  --sidebar-primary: var(--brand-50);
+  --sidebar-accent: var(--brand-700);
+  --sidebar-border: var(--brand-700);
+  --sidebar-ring: var(--brand-400);
+}
+
+    </style>
+    <style id="component-vars">
+/* components.css — Design System Component Definitions */
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-foreground: var(--card-foreground);
+    --color-accent-blue: #2563ef;
+    --color-danger: #cf001c;
+  }
+  @layer base {
+    body { background: #ffffff; color: #18181b; font-family: Geist, ui-sans-serif, sans-serif, system-ui; }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* Custom bar chart styles */
+      .bar-track {
+        background: #f5f5f5;
+        border-radius: 4px;
+        height: 8px;
+        width: 100%;
+      }
+      .bar-fill-blue {
+        background: #2563ef;
+        border-radius: 4px;
+        height: 8px;
+        transition: width 0.3s ease;
+      }
+      .bar-fill-gray {
+        background: #858585;
+        border-radius: 4px;
+        height: 8px;
+        transition: width 0.3s ease;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+
+<main class="max-w-4xl mx-auto px-6 py-0">
+
+  <!-- ========== TOP NAV ========== -->
+  <nav class="flex items-center justify-between h-16 border-b" style="border-color:#e5e5e5;">
+    <!-- Left: Logo + Back -->
+    <div class="flex items-center gap-4">
+      <span class="font-serif text-lg tracking-tight" style="color:#18181b;">AI FDE 助手</span>
+      <button data-dom-id="back-home" class="flex items-center gap-1.5 text-sm border px-3 py-1.5 rounded-[25.2px]" style="color:#858585; border-color:#e5e5e5; background:transparent; cursor:pointer; font-family:Geist,sans-serif;">
+        <i data-lucide="arrow-left" class="w-4 h-4" style="color:#858585;"></i>
+        返回
+      </button>
+    </div>
+
+    <!-- Center: Page title -->
+    <div class="absolute left-1/2 -translate-x-1/2">
+      <span class="text-sm font-medium" style="color:#18181b; font-family:Geist,sans-serif;">AI 机会报告</span>
+    </div>
+
+    <!-- Right: Export buttons + bell -->
+    <div class="flex items-center gap-3">
+      <button class="flex items-center gap-1.5 text-sm border px-3 py-1.5 rounded-[25.2px]" style="color:#18181b; border-color:#e5e5e5; background:transparent; cursor:pointer; font-family:Geist,sans-serif;">
+        <i data-lucide="file-json" class="w-4 h-4" style="color:#858585;"></i>
+        导出 JSON
+      </button>
+      <button class="flex items-center gap-1.5 text-sm border px-3 py-1.5 rounded-[25.2px]" style="color:#18181b; border-color:#e5e5e5; background:transparent; cursor:pointer; font-family:Geist,sans-serif;">
+        <i data-lucide="file-text" class="w-4 h-4" style="color:#858585;"></i>
+        导出 MD
+      </button>
+      <button data-dom-id="open-notifications" class="relative p-2 rounded-[25.2px] border" style="border-color:#e5e5e5; background:transparent; cursor:pointer;">
+        <i data-lucide="bell" class="w-4 h-4" style="color:#858585;"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ========== HEADER STATS ========== -->
+  <section class="flex items-center justify-between py-6 border-b" style="border-color:#e5e5e5;">
+    <div class="flex items-center gap-12">
+      <div class="text-center">
+        <div class="font-serif text-4xl tracking-tight" style="color:#2563ef;">6</div>
+        <div class="text-xs mt-1" style="color:#858585; font-family:Geist,sans-serif;">AI 机会</div>
+      </div>
+      <div class="text-center">
+        <div class="font-serif text-4xl tracking-tight" style="color:#2563ef;">2.5h</div>
+        <div class="text-xs mt-1" style="color:#858585; font-family:Geist,sans-serif;">每日节省</div>
+      </div>
+      <div class="text-center">
+        <div class="font-serif text-4xl tracking-tight" style="color:#cf001c;">3</div>
+        <div class="text-xs mt-1" style="color:#858585; font-family:Geist,sans-serif;">高优先级</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== OPPORTUNITY LIST ========== -->
+  <section class="mt-6 space-y-4 pb-6">
+
+    <!-- ====== CARD 1 — HIGH ====== -->
+    <div class="border rounded-[25.2px] p-6" style="border-color:#e5e5e5; border-left: 4px solid #cf001c; background:#ffffff;">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium px-2.5 py-1 rounded-[25.2px]" style="background:#cf001c; color:#ffffff; font-family:Geist,sans-serif;">高优先级</span>
+          <span class="text-base font-medium" style="color:#18181b; font-family:Geist,sans-serif;">客户信息搬运助手</span>
+        </div>
+        <span class="text-sm" style="color:#858585; font-family:Geist,sans-serif;">每周 3.5 小时</span>
+      </div>
+
+      <!-- Bars -->
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">自动化潜力</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:92%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">92%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">实现难度</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:35%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">35%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">风险等级</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:25%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">25%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">业务价值</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:88%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">88%</span>
+        </div>
+      </div>
+
+      <!-- Suggestion -->
+      <p class="text-xs mb-4" style="color:#858585; font-family:Geist,sans-serif;">建议优先搭建：每天在 CRM 与表格间搬运客户信息</p>
+
+      <!-- Evidence — expanded by default -->
+      <div class="border-t pt-4 mt-4" style="border-color:#e5e5e5;">
+        <button onclick="toggleEvidence('evidence-1')" class="flex items-center gap-1.5 text-xs mb-3" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          <i data-lucide="chevron-down" class="w-3.5 h-3.5 transition-transform" id="evidence-1-icon"></i>
+          查看证据
+        </button>
+        <div id="evidence-1" class="space-y-2">
+          <div class="flex items-center gap-4">
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">42 次/周</span>
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">3 个应用</span>
+          </div>
+          <p class="text-xs" style="color:#858585; font-family:Geist,sans-serif;">复制客户名 → 粘贴报价单 → 填写邮箱</p>
+        </div>
+      </div>
+
+      <!-- Action button -->
+      <div class="mt-4 pt-4 border-t" style="border-color:#e5e5e5;">
+        <button data-dom-id="build-agent-1" class="text-sm font-medium" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          生成 Agent 原型
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== CARD 2 — HIGH ====== -->
+    <div class="border rounded-[25.2px] p-6" style="border-color:#e5e5e5; border-left: 4px solid #cf001c; background:#ffffff;">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium px-2.5 py-1 rounded-[25.2px]" style="background:#cf001c; color:#ffffff; font-family:Geist,sans-serif;">高优先级</span>
+          <span class="text-base font-medium" style="color:#18181b; font-family:Geist,sans-serif;">库存状态问答 Agent</span>
+        </div>
+        <span class="text-sm" style="color:#858585; font-family:Geist,sans-serif;">每周 2.0 小时</span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">自动化潜力</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:85%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">85%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">实现难度</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:45%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">45%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">风险等级</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:20%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">20%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">业务价值</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:76%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">76%</span>
+        </div>
+      </div>
+
+      <p class="text-xs mb-4" style="color:#858585; font-family:Geist,sans-serif;">建议优先搭建：减少团队在库存查询上的重复沟通</p>
+
+      <!-- Evidence — collapsed by default -->
+      <div class="border-t pt-4 mt-4" style="border-color:#e5e5e5;">
+        <button onclick="toggleEvidence('evidence-2')" class="flex items-center gap-1.5 text-xs mb-3" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform" id="evidence-2-icon"></i>
+          查看证据
+        </button>
+        <div id="evidence-2" class="space-y-2" style="display:none;">
+          <div class="flex items-center gap-4">
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">28 次/周</span>
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">2 个应用</span>
+          </div>
+          <p class="text-xs" style="color:#858585; font-family:Geist,sans-serif;">打开库存表 → 搜索 SKU → 回复同事消息</p>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t" style="border-color:#e5e5e5;">
+        <button class="text-sm font-medium" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          生成 Agent 原型
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== CARD 3 — HIGH ====== -->
+    <div class="border rounded-[25.2px] p-6" style="border-color:#e5e5e5; border-left: 4px solid #cf001c; background:#ffffff;">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium px-2.5 py-1 rounded-[25.2px]" style="background:#cf001c; color:#ffffff; font-family:Geist,sans-serif;">高优先级</span>
+          <span class="text-base font-medium" style="color:#18181b; font-family:Geist,sans-serif;">自动日报助手</span>
+        </div>
+        <span class="text-sm" style="color:#858585; font-family:Geist,sans-serif;">每周 1.5 小时</span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">自动化潜力</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:90%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">90%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">实现难度</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:30%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">30%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">风险等级</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:15%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">15%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">业务价值</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:65%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">65%</span>
+        </div>
+      </div>
+
+      <p class="text-xs mb-4" style="color:#858585; font-family:Geist,sans-serif;">建议优先搭建：自动汇总当日工作内容生成日报</p>
+
+      <div class="border-t pt-4 mt-4" style="border-color:#e5e5e5;">
+        <button onclick="toggleEvidence('evidence-3')" class="flex items-center gap-1.5 text-xs mb-3" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform" id="evidence-3-icon"></i>
+          查看证据
+        </button>
+        <div id="evidence-3" class="space-y-2" style="display:none;">
+          <div class="flex items-center gap-4">
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">5 次/周</span>
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">4 个应用</span>
+          </div>
+          <p class="text-xs" style="color:#858585; font-family:Geist,sans-serif;">打开多个工具 → 复制数据 → 粘贴到日报模板 → 排版调整</p>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t" style="border-color:#e5e5e5;">
+        <button class="text-sm font-medium" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          生成 Agent 原型
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== CARD 4 — MEDIUM ====== -->
+    <div class="border rounded-[25.2px] p-6" style="border-color:#e5e5e5; border-left: 4px solid #f5f5f5; background:#ffffff;">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium px-2.5 py-1 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#858585; font-family:Geist,sans-serif;">中优先级</span>
+          <span class="text-base font-medium" style="color:#18181b; font-family:Geist,sans-serif;">报价单生成工作流</span>
+        </div>
+        <span class="text-sm" style="color:#858585; font-family:Geist,sans-serif;">每周 1.2 小时</span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">自动化潜力</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:78%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">78%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">实现难度</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:60%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">60%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">风险等级</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:40%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">40%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">业务价值</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:70%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">70%</span>
+        </div>
+      </div>
+
+      <p class="text-xs mb-4" style="color:#858585; font-family:Geist,sans-serif;">可根据业务节奏逐步落地自动化</p>
+
+      <div class="border-t pt-4 mt-4" style="border-color:#e5e5e5;">
+        <button onclick="toggleEvidence('evidence-4')" class="flex items-center gap-1.5 text-xs mb-3" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform" id="evidence-4-icon"></i>
+          查看证据
+        </button>
+        <div id="evidence-4" class="space-y-2" style="display:none;">
+          <div class="flex items-center gap-4">
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">15 次/周</span>
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">3 个应用</span>
+          </div>
+          <p class="text-xs" style="color:#858585; font-family:Geist,sans-serif;">查询价格表 → 手动填写报价单 → 发送给客户</p>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t" style="border-color:#e5e5e5;">
+        <button class="text-sm font-medium" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          生成 Agent 原型
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== CARD 5 — MEDIUM ====== -->
+    <div class="border rounded-[25.2px] p-6" style="border-color:#e5e5e5; border-left: 4px solid #f5f5f5; background:#ffffff;">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium px-2.5 py-1 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#858585; font-family:Geist,sans-serif;">中优先级</span>
+          <span class="text-base font-medium" style="color:#18181b; font-family:Geist,sans-serif;">邮件模板撰写 Copilot</span>
+        </div>
+        <span class="text-sm" style="color:#858585; font-family:Geist,sans-serif;">每周 0.8 小时</span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">自动化潜力</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:70%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">70%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">实现难度</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:55%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">55%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">风险等级</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:35%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">35%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">业务价值</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:55%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">55%</span>
+        </div>
+      </div>
+
+      <p class="text-xs mb-4" style="color:#858585; font-family:Geist,sans-serif;">可作为团队效率提升的补充工具</p>
+
+      <div class="border-t pt-4 mt-4" style="border-color:#e5e5e5;">
+        <button onclick="toggleEvidence('evidence-5')" class="flex items-center gap-1.5 text-xs mb-3" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5 transition-transform" id="evidence-5-icon"></i>
+          查看证据
+        </button>
+        <div id="evidence-5" class="space-y-2" style="display:none;">
+          <div class="flex items-center gap-4">
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">10 次/周</span>
+            <span class="text-xs px-2 py-0.5 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#18181b; font-family:Geist Mono,monospace;">1 个应用</span>
+          </div>
+          <p class="text-xs" style="color:#858585; font-family:Geist,sans-serif;">打开邮件 → 搜索历史模板 → 修改内容 → 发送</p>
+        </div>
+      </div>
+
+      <div class="mt-4 pt-4 border-t" style="border-color:#e5e5e5;">
+        <button class="text-sm font-medium" style="color:#2563ef; background:none; border:none; cursor:pointer; font-family:Geist,sans-serif; padding:0;">
+          生成 Agent 原型
+        </button>
+      </div>
+    </div>
+
+    <!-- ====== CARD 6 — LOW ====== -->
+    <div class="border rounded-[25.2px] p-6" style="border-color:#e5e5e5; border-left: 4px solid #e5e5e5; background:#ffffff;">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs font-medium px-2.5 py-1 rounded-[25.2px] border" style="border-color:#e5e5e5; color:#858585; font-family:Geist,sans-serif;">低优先级</span>
+          <span class="text-base font-medium" style="color:#18181b; font-family:Geist,sans-serif;">表格/文档自动化助手</span>
+        </div>
+        <span class="text-sm" style="color:#858585; font-family:Geist,sans-serif;">每周 0.5 小时</span>
+      </div>
+
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">自动化潜力</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:55%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">55%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">实现难度</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:70%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">70%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">风险等级</span>
+          <div class="bar-track flex-1"><div class="bar-fill-gray" style="width:50%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#858585; font-family:Geist Mono,monospace;">50%</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="text-xs w-20 shrink-0" style="color:#858585; font-family:Geist,sans-serif;">业务价值</span>
+          <div class="bar-track flex-1"><div class="bar-fill-blue" style="width:40%;"></div></div>
+          <span class="text-xs w-8 text-right shrink-0" style="color:#2563ef; font-family:Geist Mono,monospace;">40%</span>
+        </div>
+      </div>
+
+      <p class="text-xs" style="color:#858585; font-family:Geist,sans-serif;">暂不建议 — 投入产出比较低，建议观望或结合其他需求再评估</p>
+    </div>
+
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="border-t py-6 mt-2" style="border-color:#e5e5e5;">
+    <p class="text-xs text-center" style="color:#858585; font-family:Geist,sans-serif;">所有建议可追溯到具体操作行为</p>
+  </footer>
+
+</main>
+
+<script>
+function toggleEvidence(id) {
+  const el = document.getElementById(id);
+  const icon = document.getElementById(id + '-icon');
+  if (!el || !icon) return;
+
+  if (el.style.display === 'none') {
+    el.style.display = '';
+    icon.setAttribute('data-lucide', 'chevron-down');
+  } else {
+    el.style.display = 'none';
+    icon.setAttribute('data-lucide', 'chevron-right');
+  }
+  lucide.createIcons();
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Set the first evidence card to show chevron-down (it's expanded by default)
+  const icon1 = document.getElementById('evidence-1-icon');
+  if (icon1) {
+    icon1.setAttribute('data-lucide', 'chevron-down');
+    lucide.createIcons();
+  }
+});
+</script>
+
+</body>
+</html>

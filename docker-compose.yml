@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  ai-workflow-observer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-workflow-observer
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - SERVER_HOST=${SERVER_HOST:-0.0.0.0}
+      - SERVER_PORT=${SERVER_PORT:-3000}
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_API_BASE=${LLM_API_BASE}
+      - LLM_MODEL=${LLM_MODEL}
+      - LLM_SEND_EVENTS=${LLM_SEND_EVENTS:-false}
+      - LLM_MAX_TOKENS=${LLM_MAX_TOKENS:-2048}
+      - OCR_PROVIDER=${OCR_PROVIDER:-local}
+      - OCR_API_KEY=${OCR_API_KEY}
+      - OCR_API_ENDPOINT=${OCR_API_ENDPOINT}
+      - DATA_DIR=${DATA_DIR:-/app/.data}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+    ports:
+      - "${SERVER_PORT:-3000}:3000"
+    volumes:
+      - app-data:/app/.data
+      - app-uploads:/app/uploads
+    networks:
+      - ai-observer-network
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai-observer-redis
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    volumes:
+      - redis-data:/data
+    networks:
+      - ai-observer-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    restart: unless-stopped
+
+volumes:
+  app-data:
+    driver: local
+  app-uploads:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  ai-observer-network:
+    driver: bridge

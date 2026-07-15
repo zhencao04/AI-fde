@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI FDE 助手</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-sans/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/fonts/geist-mono/style.css">
+    <style id="theme-vars">
+:root {
+  --brand-50: #fafafa;
+  --brand-100: #f4f4f5;
+  --brand-200: #e4e4e7;
+  --brand-300: #d4d4d8;
+  --brand-400: #a1a1aa;
+  --brand-500: #71717a;
+  --brand-600: #52525b;
+  --brand-700: #3f3f46;
+  --brand-800: #27272a;
+  --brand-900: #18181b;
+
+  --background-50: #ffffff;
+  --background-100: #fafafa;
+  --background-200: #f5f5f5;
+  --background-300: #e5e5e5;
+  --background-400: #d4d4d4;
+  --background-500: #a3a3a3;
+  --background-600: #404040;
+  --background-700: #262626;
+  --background-800: #171717;
+  --background-900: #0a0a0a;
+
+  --text-50: #fafafa;
+  --text-100: #ededed;
+  --text-200: #d4d4d4;
+  --text-300: #a1a1a1;
+  --text-400: #858585;
+  --text-500: #6e6e6e;
+  --text-600: #525252;
+  --text-700: #404040;
+  --text-800: #171717;
+  --text-900: #0a0a0a;
+
+  --icon-50: #fafafa;
+  --icon-100: #e5e5e5;
+  --icon-200: #d4d4d8;
+  --icon-300: #b0b0b0;
+  --icon-400: #8f8f8f;
+  --icon-500: #6e6e6e;
+  --icon-600: #525252;
+  --icon-700: #404040;
+  --icon-800: #262626;
+  --icon-900: #0a0a0a;
+
+  --background: var(--background-50);
+  --card: var(--background-50);
+  --popover: var(--background-50);
+  --muted: var(--background-100);
+  --foreground: var(--brand-900);
+  --card-foreground: var(--brand-900);
+  --popover-foreground: var(--brand-900);
+  --primary-foreground: var(--brand-50);
+  --secondary-foreground: var(--brand-900);
+  --muted-foreground: var(--brand-500);
+  --accent-foreground: var(--brand-900);
+  --destructive-foreground: var(--background-50);
+  --primary: var(--brand-900);
+  --secondary: var(--brand-100);
+  --accent: var(--brand-100);
+  --input: var(--brand-200);
+  --ring: var(--brand-900);
+  --border: var(--brand-200);
+  --border-strong: var(--brand-300);
+  --accent-blue: #2563ef;
+  --error: #cf001c;
+  --success: #16a34a;
+  --success-foreground: var(--background-50);
+  --success-subtle: #f0fdf4;
+  --success-border: #bbf7d0;
+  --success-text: #15803d;
+  --destructive: #dc2626;
+  --destructive-subtle: #fef2f2;
+  --destructive-border: #fecaca;
+  --destructive-text: #b91c1c;
+  --brand-subtle: var(--brand-100);
+  --brand-border: var(--brand-300);
+  --font-sans: Geist, ui-sans-serif, sans-serif, system-ui;
+  --font-serif: DM Serif Display, ui-serif, serif;
+  --font-mono: Geist Mono, ui-monospace, monospace;
+  --tracking-normal: 0em;
+  --tracking-tight: -0.012em;
+  --radius: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius-lg: 1rem;
+  --spacing: 0.25rem;
+  --color-surface: var(--background);
+  --color-surface-muted: var(--muted);
+  --color-text: var(--foreground);
+  --color-text-muted: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-brand: var(--primary);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-brand-border: var(--brand-border);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --space-4: var(--spacing);
+  --radius-md: var(--radius);
+}
+    </style>
+    <style id="component-vars">
+/* components.css stub */
+    </style>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        line-height: 1.5;
+        color: var(--foreground);
+        background: var(--background);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* Radius override per brief: 25.2px everywhere */
+      :root {
+        --r: 25.2px;
+        --r-sm: 16px;
+      }
+
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+      /* Icon mask system */
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+
+      /* ── Layout ── */
+      .layout {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
+
+      /* Left panel */
+      .panel-left {
+        width: 35%;
+        min-width: 340px;
+        max-width: 480px;
+        background: var(--background-200);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 32px;
+        position: relative;
+      }
+
+      .panel-left .logo {
+        position: absolute;
+        top: 24px;
+        left: 28px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--foreground);
+      }
+      .panel-left .logo-icon {
+        width: 24px;
+        height: 24px;
+      }
+      .panel-left .logo-label {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+
+      .brand-name {
+        font-family: var(--font-serif);
+        font-size: 28px;
+        color: var(--foreground);
+        margin-bottom: 8px;
+        letter-spacing: -0.02em;
+      }
+
+      .brand-subtitle {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        color: var(--text-400);
+        margin-bottom: 40px;
+      }
+
+      /* Tabs */
+      .login-tabs {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 32px;
+        border-bottom: 1px solid var(--border);
+        width: 100%;
+        max-width: 320px;
+      }
+      .login-tab {
+        font-family: var(--font-sans);
+        font-size: 13px;
+        color: var(--text-400);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding-bottom: 10px;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+        font-weight: 500;
+      }
+      .login-tab:hover {
+        color: var(--foreground);
+      }
+      .login-tab.active {
+        color: var(--accent-blue);
+        border-bottom-color: var(--accent-blue);
+      }
+
+      /* Tab panels */
+      .tab-panel {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        max-width: 320px;
+      }
+      .tab-panel.active {
+        display: flex;
+      }
+
+      /* QR placeholder */
+      .qr-placeholder {
+        width: 200px;
+        height: 200px;
+        border: 2px dashed var(--border);
+        border-radius: var(--r);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 16px;
+        background: var(--background-50);
+      }
+      .qr-placeholder span {
+        font-size: 12px;
+        color: var(--text-300);
+      }
+
+      .scan-text {
+        font-size: 13px;
+        color: var(--text-400);
+      }
+
+      /* Phone login form */
+      .phone-form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 100%;
+      }
+      .input-row {
+        display: flex;
+        gap: 8px;
+      }
+      .input-field {
+        flex: 1;
+        height: 44px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 0 16px;
+        font-family: var(--font-sans);
+        font-size: 13px;
+        color: var(--foreground);
+        background: var(--background-50);
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .input-field::placeholder {
+        color: var(--text-300);
+      }
+      .input-field:focus {
+        border-color: var(--accent-blue);
+      }
+
+      .btn-send-code {
+        height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        background: var(--background-50);
+        color: var(--text-600);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: border-color 0.15s, color 0.15s;
+      }
+      .btn-send-code:hover {
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+      }
+
+      .btn-login {
+        height: 48px;
+        border: none;
+        border-radius: var(--r);
+        background: var(--accent-blue);
+        color: #ffffff;
+        font-family: var(--font-sans);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.15s;
+        margin-top: 4px;
+      }
+      .btn-login:hover {
+        opacity: 0.9;
+      }
+
+      /* Trust line */
+      .trust-line {
+        position: absolute;
+        bottom: 24px;
+        font-size: 11px;
+        color: var(--text-300);
+        letter-spacing: 0.04em;
+      }
+
+      /* ── Right panel ── */
+      .panel-right {
+        width: 65%;
+        background: var(--background-50);
+        display: flex;
+        flex-direction: column;
+        border-left: 1px solid var(--border);
+      }
+
+      /* Top bar */
+      .top-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 32px;
+        border-bottom: 1px solid var(--border);
+      }
+      .top-bar-title {
+        font-family: var(--font-sans);
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--foreground);
+        letter-spacing: var(--tracking-tight);
+      }
+      .top-bar-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: var(--r);
+        border: 1px solid var(--border);
+        background: var(--background-50);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: var(--text-600);
+        transition: border-color 0.15s, color 0.15s;
+      }
+      .icon-btn:hover {
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+      }
+      .avatar-circle {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--accent-blue);
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      /* Search */
+      .search-area {
+        padding: 20px 32px 16px;
+      }
+      .search-input {
+        width: 100%;
+        height: 44px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        padding: 0 16px 0 44px;
+        font-family: var(--font-sans);
+        font-size: 13px;
+        color: var(--foreground);
+        background: var(--background-50);
+        outline: none;
+        transition: border-color 0.15s;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23858585' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: 16px center;
+      }
+      .search-input::placeholder {
+        color: var(--text-300);
+      }
+      .search-input:focus {
+        border-color: var(--accent-blue);
+      }
+
+      /* Conversation list */
+      .conversation-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0 32px;
+      }
+      .no-scrollbar .conversation-list {
+        scrollbar-width: none;
+      }
+
+      .conv-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 16px 16px;
+        border-bottom: 1px solid var(--border);
+        cursor: pointer;
+        transition: background 0.12s;
+        border-left: 3px solid transparent;
+      }
+      .conv-item:hover {
+        background: var(--background-100);
+      }
+      .conv-item.active {
+        border-left-color: var(--accent-blue);
+        background: var(--background-100);
+      }
+
+      .conv-info {
+        flex: 1;
+        min-width: 0;
+      }
+      .conv-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--foreground);
+        margin-bottom: 4px;
+        letter-spacing: var(--tracking-tight);
+      }
+      .conv-meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        color: var(--text-400);
+      }
+
+      .conv-status {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--text-400);
+        white-space: nowrap;
+      }
+      .conv-status.active-status {
+        color: var(--accent-blue);
+      }
+      .conv-status.done {
+        color: var(--success);
+      }
+      .conv-status.paused {
+        color: var(--text-300);
+      }
+
+      .conv-right {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 8px;
+        min-width: 160px;
+      }
+
+      .progress-track {
+        width: 100%;
+        height: 4px;
+        background: var(--background-300);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.3s;
+      }
+      .progress-fill.blue {
+        background: var(--accent-blue);
+      }
+      .progress-fill.gray {
+        background: var(--text-300);
+      }
+
+      /* New conversation button */
+      .bottom-bar {
+        padding: 20px 32px;
+        border-top: 1px solid var(--border);
+      }
+      .btn-new {
+        width: 100%;
+        height: 44px;
+        border: 1px solid var(--border);
+        border-radius: var(--r);
+        background: var(--background-50);
+        color: var(--foreground);
+        font-family: var(--font-sans);
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: border-color 0.15s, color 0.15s;
+      }
+      .btn-new:hover {
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+      }
+      .btn-new [data-icon] {
+        width: 16px;
+        height: 16px;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+    <main>
+      <div class="layout">
+
+        <!-- ═══════════ LEFT PANEL (35%) ═══════════ -->
+        <section class="panel-left">
+          <a class="logo" data-dom-id="back-home">
+            <span data-icon="arrow-left" style="width:18px;height:18px;"></span>
+            <span class="logo-label">返回首页</span>
+          </a>
+
+          <h1 class="brand-name">AI FDE 助手</h1>
+          <p class="brand-subtitle">观察工作模式，定制专属 AI 助手</p>
+
+          <div class="login-tabs">
+            <button class="login-tab active" data-tab="wechat">微信登录</button>
+            <button class="login-tab" data-tab="alipay">支付宝登录</button>
+            <button class="login-tab" data-tab="phone">手机号登录</button>
+          </div>
+
+          <!-- WeChat tab -->
+          <div class="tab-panel active" id="tab-wechat">
+            <div class="qr-placeholder">
+              <span>二维码</span>
+            </div>
+            <p class="scan-text">扫描二维码登录</p>
+          </div>
+
+          <!-- Alipay tab -->
+          <div class="tab-panel" id="tab-alipay">
+            <div class="qr-placeholder">
+              <span>二维码</span>
+            </div>
+            <p class="scan-text">扫描二维码登录</p>
+          </div>
+
+          <!-- Phone tab -->
+          <div class="tab-panel" id="tab-phone">
+            <div class="phone-form">
+              <input class="input-field" type="tel" placeholder="手机号" maxlength="11">
+              <div class="input-row">
+                <input class="input-field" type="text" placeholder="验证码" maxlength="6">
+                <button class="btn-send-code">发送验证码</button>
+              </div>
+              <button class="btn-login">登录</button>
+            </div>
+          </div>
+
+          <p class="trust-line">本地加密 · 隐私优先 · 到期销毁</p>
+        </section>
+
+        <!-- ═══════════ RIGHT PANEL (65%) ═══════════ -->
+        <section class="panel-right">
+          <div class="top-bar">
+            <h2 class="top-bar-title">对话列表</h2>
+            <div class="top-bar-actions">
+              <button class="icon-btn" data-dom-id="open-notifications" title="通知">
+                <span data-icon="message-circle-more" style="width:18px;height:18px;"></span>
+              </button>
+              <button class="icon-btn" data-dom-id="open-settings" title="设置">
+                <span data-icon="pen-line" style="width:18px;height:18px;"></span>
+              </button>
+              <div class="avatar-circle" title="用户">U</div>
+            </div>
+          </div>
+
+          <div class="search-area">
+            <input class="search-input" type="text" placeholder="搜索...">
+          </div>
+
+          <div class="conversation-list no-scrollbar">
+
+            <!-- Conversation 1 — Active -->
+            <div class="conv-item active" data-dom-id="open-conversation-1">
+              <div class="conv-info">
+                <div class="conv-title">客户信息搬运助手</div>
+                <div class="conv-meta">
+                  <span class="conv-status active-status">观察中 · 第 2 天 / 3 天</span>
+                  <span>1,247 条事件</span>
+                </div>
+              </div>
+              <div class="conv-right">
+                <div class="progress-track">
+                  <div class="progress-fill blue" style="width:65%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversation 2 — Completed -->
+            <div class="conv-item">
+              <div class="conv-info">
+                <div class="conv-title">库存状态问答 Agent</div>
+                <div class="conv-meta">
+                  <span class="conv-status done">已完成</span>
+                  <span>3 个 AI 机会</span>
+                </div>
+              </div>
+              <div class="conv-right">
+                <div class="progress-track">
+                  <div class="progress-fill gray" style="width:100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversation 3 — Paused -->
+            <div class="conv-item">
+              <div class="conv-info">
+                <div class="conv-title">自动日报助手</div>
+                <div class="conv-meta">
+                  <span class="conv-status paused">已暂停</span>
+                  <span>423 条事件</span>
+                </div>
+              </div>
+              <div class="conv-right">
+                <div class="progress-track">
+                  <div class="progress-fill gray" style="width:30%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Conversation 4 — Pending -->
+            <div class="conv-item">
+              <div class="conv-info">
+                <div class="conv-title">报价单生成工作流</div>
+                <div class="conv-meta">
+                  <span class="conv-status paused">待开始</span>
+                </div>
+              </div>
+              <div class="conv-right">
+                <div class="progress-track">
+                  <div class="progress-fill gray" style="width:0%;"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="bottom-bar">
+            <button class="btn-new">
+              <span data-icon="circle-plus" style="width:16px;height:16px;"></span>
+              新建对话
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <script>
+      // ── Inline SVG masks for data-icon elements ──
+      (function () {
+        const icons = {
+          'arrow-left': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>',
+          'check': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+          'chevron-down': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+          'pen-line': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>',
+          'message-circle-more': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M12 8v2"/><path d="M12 14h.01"/></svg>',
+          'user': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+          'circle-plus': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>'
+        };
+
+        // Encode SVGs as data URIs for mask-image
+        Object.entries(icons).forEach(([name, svg]) => {
+          const encoded = 'data:image/svg+xml,' + encodeURIComponent(svg.replace('currentColor', 'black'));
+          document.querySelectorAll('[data-icon="' + name + '"]').forEach(function (el) {
+            el.style.webkitMaskImage = 'url(' + encoded + ')';
+            el.style.maskImage = 'url(' + encoded + ')';
+          });
+        });
+      })();
+
+      // ── Tab switching ──
+      (function () {
+        const tabs = document.querySelectorAll('.login-tab');
+        const panels = document.querySelectorAll('.tab-panel');
+
+        tabs.forEach(function (tab) {
+          tab.addEventListener('click', function () {
+            var target = this.getAttribute('data-tab');
+
+            tabs.forEach(function (t) { t.classList.remove('active'); });
+            panels.forEach(function (p) { p.classList.remove('active'); });
+
+            this.classList.add('active');
+            var panel = document.getElementById('tab-' + target);
+            if (panel) panel.classList.add('active');
+          });
+        });
+      })();
+    </script>
+</body>
+</html>

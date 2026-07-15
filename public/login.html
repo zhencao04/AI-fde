@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI FDE 助手 - 登录</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/auth.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .glass-effect {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    }
+    
+    .animate-float {
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .animate-pulse-slow {
+      animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    .input-focus-ring:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+    
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .status-recording { background-color: #ef4444; animation: pulse 2s infinite; }
+    .status-paused { background-color: #f59e0b; }
+    .status-finalized { background-color: #10b981; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- ===== LOGIN PAGE ===== -->
+  <div id="login-page" class="page flex flex-col lg:flex-row min-h-screen">
+    <!-- Left Side - Brand & Illustration -->
+    <div class="lg:w-2/5 gradient-bg text-white relative overflow-hidden">
+      <div class="absolute inset-0 opacity-30">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-purple-600 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div class="relative z-10 p-8 lg:p-16 flex flex-col h-full">
+        <div class="flex items-center gap-3 mb-12">
+          <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
+            <span class="text-xl font-bold">F</span>
+          </div>
+          <span class="text-lg font-semibold tracking-tight">AI FDE 助手</span>
+        </div>
+        
+        <div class="flex-1 flex flex-col justify-center">
+          <h1 class="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
+            观察工作模式<br/>
+            <span class="text-blue-400">定制专属 AI 助手</span>
+          </h1>
+          <p class="text-gray-300 text-lg mb-8 max-w-md">
+            通过智能观察您的日常工作流程，识别可自动化的任务，生成专属的 AI 助手解决方案。
+          </p>
+          
+          <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-sm text-gray-300">本地加密</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-sm text-gray-300">隐私优先</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-sm text-gray-300">到期销毁</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-auto">
+          <div class="bg-white/10 glass-effect rounded-2xl p-6">
+            <h3 class="font-semibold mb-4">近期发现的 AI 机会</h3>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="copy" class="w-4 h-4 text-blue-400"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-medium">客户信息搬运助手</div>
+                  <div class="text-xs text-gray-400">自动化潜力 92%</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                  <i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-medium">自动日报助手</div>
+                  <div class="text-xs text-gray-400">自动化潜力 85%</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Right Side - Login Form & Sessions -->
+    <div class="lg:w-3/5 flex flex-col">
+      <!-- Header -->
+      <header class="flex items-center justify-between px-6 lg:px-12 py-4 border-b border-gray-200">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+            <span class="text-sm font-bold text-white">F</span>
+          </div>
+          <span class="font-semibold text-gray-800">AI FDE 助手</span>
+        </div>
+        
+        <div class="flex items-center gap-4">
+          <button id="header-notif-btn" class="relative p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <i data-lucide="bell" class="w-5 h-5 text-gray-600"></i>
+            <span class="notif-badge absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center" style="display:none;">0</span>
+          </button>
+          <button id="header-settings-btn" class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <i data-lucide="settings" class="w-5 h-5 text-gray-600"></i>
+          </button>
+          <div id="user-avatar" class="hidden w-9 h-9 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:bg-blue-600 transition-colors relative">
+            U
+            <!-- User dropdown menu -->
+            <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+              <div class="px-4 py-2 border-b border-gray-100">
+                <div class="font-medium text-gray-800" id="dropdown-user-name">用户</div>
+                <div class="text-xs text-gray-500" id="dropdown-user-email">user@example.com</div>
+              </div>
+              <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <i data-lucide="user" class="w-4 h-4"></i>个人资料
+              </a>
+              <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <i data-lucide="settings" class="w-4 h-4"></i>账号设置
+              </a>
+              <div class="border-t border-gray-100 mt-1 pt-1">
+                <a href="#" id="dropdown-logout" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                  <i data-lucide="log-out" class="w-4 h-4"></i>退出登录
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <!-- Main Content -->
+      <main class="flex-1 flex flex-col overflow-hidden">
+        <!-- Login/Register Form -->
+        <div id="auth-section" class="flex-1 flex flex-col items-center justify-center px-6 py-8">
+          <div class="w-full max-w-md">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">欢迎回来</h2>
+            <p class="text-gray-500 mb-8">登录您的账户，开始智能工作流程分析</p>
+            
+            <!-- Tabs -->
+            <div class="flex gap-8 mb-8 border-b border-gray-200">
+              <button id="tab-login" class="pb-3 text-blue-600 font-medium border-b-2 border-blue-600 transition-colors">登录</button>
+              <button id="tab-register" class="pb-3 text-gray-500 font-medium border-b-2 border-transparent hover:text-gray-700 transition-colors">注册</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="space-y-5">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+                <input type="email" id="login-email" required
+                  class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl input-focus-ring transition-all"
+                  placeholder="your@email.com">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                <input type="password" id="login-password" required
+                  class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl input-focus-ring transition-all"
+                  placeholder="至少8位密码">
+              </div>
+              <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 text-sm text-gray-600">
+                  <input type="checkbox" class="w-4 h-4 text-blue-600 rounded border-gray-300">
+                  记住我
+                </label>
+                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">忘记密码？</a>
+              </div>
+              <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
+                登录
+              </button>
+            </form>
+            
+            <!-- Register Form (hidden) -->
+            <form id="register-form" class="space-y-5 hidden">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                <input type="text" id="register-username" required
+                  class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl input-focus-ring transition-all"
+                  placeholder="请输入用户名">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+                <input type="email" id="register-email" required
+                  class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl input-focus-ring transition-all"
+                  placeholder="your@email.com">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                <input type="password" id="register-password" required
+                  class="w-full px-4 py-3 bg-white border border-gray-300 rounded-xl input-focus-ring transition-all"
+                  placeholder="至少8位密码">
+              </div>
+              <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
+                注册
+              </button>
+            </form>
+            
+            <div class="mt-8 flex items-center gap-4">
+              <div class="flex-1 h-px bg-gray-300"></div>
+              <span class="text-sm text-gray-500">或</span>
+              <div class="flex-1 h-px bg-gray-300"></div>
+            </div>
+            
+            <div class="mt-6 flex gap-4">
+              <button id="btn-wechat-login" class="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                <i data-lucide="message-circle" class="w-5 h-5 text-green-600"></i>
+                <span class="text-sm font-medium">微信登录</span>
+              </button>
+              <button id="btn-alipay-login" class="flex-1 flex items-center justify-center gap-2 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
+                <i data-lucide="scan-line" class="w-5 h-5 text-blue-600"></i>
+                <span class="text-sm font-medium">支付宝登录</span>
+              </button>
+            </div>
+            
+
+          </div>
+        </div>
+        
+        <!-- Sessions List (hidden until login) -->
+        <div id="sessions-section" class="hidden flex-1 flex flex-col">
+          <!-- Search Bar -->
+          <div class="px-6 lg:px-12 py-4 border-b border-gray-200">
+            <div class="flex gap-3">
+              <div class="relative flex-1">
+                <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+                <input type="text" id="session-search" placeholder="搜索会话..."
+                  class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+              </div>
+              <button class="px-4 py-3 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">
+                <i data-lucide="filter" class="w-5 h-5 text-gray-600"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Sessions List -->
+          <div id="sessions-list" class="flex-1 overflow-y-auto px-6 lg:px-12 py-4 space-y-3 scrollbar-thin">
+            <!-- Session items will be rendered here -->
+            <div class="text-center py-12 text-gray-400">
+              <i data-lucide="search" class="w-12 h-12 mx-auto mb-4 opacity-50"></i>
+              <p>暂无会话，点击下方按钮创建</p>
+            </div>
+          </div>
+          
+          <!-- Bottom Bar -->
+          <div class="px-6 lg:px-12 py-4 border-t border-gray-200">
+            <button id="btn-new-session" class="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors">
+              <i data-lucide="plus" class="w-5 h-5"></i>
+              新建观察会话
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ===== NEW SESSION MODAL ===== -->
+  <div id="new-session-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-800">新建观察会话</h3>
+        <button id="close-modal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+        </button>
+      </div>
+      
+      <div class="p-6 space-y-5">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">职业角色</label>
+          <input type="text" id="session-role" placeholder="例如：销售助理、行政助理"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+          <!-- AI Role Suggestions -->
+          <div id="role-suggestions" class="hidden mt-2 p-3 bg-blue-50 border border-blue-200 rounded-xl">
+            <div class="flex items-center gap-2 mb-2">
+              <i data-lucide="sparkles" class="w-4 h-4 text-blue-600"></i>
+              <span class="text-sm font-medium text-blue-800">AI 智能识别</span>
+            </div>
+            <div class="text-sm text-blue-700 mb-2" id="role-analysis-text">检测到您可能是 <strong>销售助理</strong>，工作中常用 Excel、CRM、邮件等应用。</div>
+            <div class="flex flex-wrap gap-2" id="role-suggested-apps">
+              <span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">Excel</span>
+              <span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">CRM系统</span>
+              <span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">邮件</span>
+            </div>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">观察时长</label>
+          <div class="grid grid-cols-3 gap-3">
+            <button class="duration-btn py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-days="1">1 天</button>
+            <button class="duration-btn py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors selected bg-blue-50 border-blue-500 text-blue-600" data-days="3">3 天</button>
+            <button class="duration-btn py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" data-days="7">7 天</button>
+          </div>
+        </div>
+        
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">会话口令</label>
+          <input type="password" id="session-password" placeholder="至少8位，用于加密数据"
+            class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+          <p class="text-xs text-gray-400 mt-2">请牢记此口令，丢失后无法恢复数据</p>
+        </div>
+        
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-sm font-medium text-gray-700">观察应用（可选）</label>
+            <button id="btn-scan-apps" class="text-xs text-blue-600 hover:text-blue-700 flex items-center gap-1">
+              <i data-lucide="scan" class="w-3 h-3"></i>扫描本机应用
+            </button>
+          </div>
+          <!-- App Search -->
+          <div class="relative mb-3">
+            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"></i>
+            <input type="text" id="app-search" placeholder="搜索应用..."
+              class="w-full pl-9 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500">
+          </div>
+          <!-- App Scanning Progress -->
+          <div id="app-scan-progress" class="hidden mb-3 p-3 bg-gray-50 rounded-xl">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <span class="text-sm text-gray-600">正在扫描已安装应用...</span>
+            </div>
+            <div class="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div id="scan-progress-bar" class="h-full bg-blue-500 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+          </div>
+          <!-- App Selection Grid -->
+          <div id="app-selection-grid" class="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
+            <button type="button" class="app-tag px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm border border-blue-200 hover:bg-blue-100 transition-colors selected" data-app="Excel">Excel</button>
+            <button type="button" class="app-tag px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm border border-transparent hover:bg-gray-200 transition-colors" data-app="Word">Word</button>
+            <button type="button" class="app-tag px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm border border-blue-200 hover:bg-blue-100 transition-colors selected" data-app="邮件">邮件</button>
+            <button type="button" class="app-tag px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm border border-transparent hover:bg-gray-200 transition-colors" data-app="CRM系统">CRM系统</button>
+            <button type="button" class="app-tag px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm border border-transparent hover:bg-gray-200 transition-colors" data-app="企业微信">企业微信</button>
+            <button type="button" class="app-tag px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm border border-transparent hover:bg-gray-200 transition-colors" data-app="浏览器">浏览器</button>
+          </div>
+          <p class="text-xs text-gray-400 mt-2">点击选择需要观察的应用，蓝色为已选中。扫描后可搜索应用。</p>
+        </div>
+      </div>
+      
+      <div class="px-6 py-4 border-t border-gray-200">
+        <button id="btn-create-session" class="w-full bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors">
+          创建并开始观察
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+      
+      var loginTab = document.getElementById('tab-login');
+      var registerTab = document.getElementById('tab-register');
+      var loginForm = document.getElementById('login-form');
+      var registerForm = document.getElementById('register-form');
+      var authSection = document.getElementById('auth-section');
+      var sessionsSection = document.getElementById('sessions-section');
+      var userAvatar = document.getElementById('user-avatar');
+      
+      loginTab.addEventListener('click', function() {
+        loginTab.classList.add('text-blue-600', 'border-blue-600');
+        loginTab.classList.remove('text-gray-500', 'border-transparent');
+        registerTab.classList.add('text-gray-500', 'border-transparent');
+        registerTab.classList.remove('text-blue-600', 'border-blue-600');
+        loginForm.classList.remove('hidden');
+        registerForm.classList.add('hidden');
+      });
+      
+      registerTab.addEventListener('click', function() {
+        registerTab.classList.add('text-blue-600', 'border-blue-600');
+        registerTab.classList.remove('text-gray-500', 'border-transparent');
+        loginTab.classList.add('text-gray-500', 'border-transparent');
+        loginTab.classList.remove('text-blue-600', 'border-blue-600');
+        registerForm.classList.remove('hidden');
+        loginForm.classList.add('hidden');
+      });
+      
+      loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var email = document.getElementById('login-email').value;
+        var password = document.getElementById('login-password').value;
+        
+        FDE.auth.login(email, password).then(function() {
+          showSessions();
+          FDE.ui.toast('ok', '登录成功', '欢迎使用 AI FDE 助手');
+        }).catch(function(err) {
+          FDE.ui.toast('err', '登录失败', err.message);
+        });
+      });
+      
+      registerForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var username = document.getElementById('register-username').value;
+        var email = document.getElementById('register-email').value;
+        var password = document.getElementById('register-password').value;
+        
+        FDE.auth.register(email, username, password).then(function() {
+          showSessions();
+          FDE.ui.toast('ok', '注册成功', '欢迎使用 AI FDE 助手');
+        }).catch(function(err) {
+          FDE.ui.toast('err', '注册失败', err.message);
+        });
+      });
+      
+      document.getElementById('btn-new-session').addEventListener('click', function() {
+        document.getElementById('new-session-modal').classList.remove('hidden');
+      });
+      
+      document.getElementById('close-modal').addEventListener('click', function() {
+        document.getElementById('new-session-modal').classList.add('hidden');
+      });
+      
+      document.querySelectorAll('.duration-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.duration-btn').forEach(function(b) {
+            b.classList.remove('selected', 'bg-blue-50', 'border-blue-500', 'text-blue-600');
+          });
+          btn.classList.add('selected', 'bg-blue-50', 'border-blue-500', 'text-blue-600');
+        });
+      });
+      
+      document.getElementById('btn-create-session').addEventListener('click', function() {
+        var roleName = document.getElementById('session-role').value;
+        var password = document.getElementById('session-password').value;
+        
+        if (!password || password.length < 8) {
+          FDE.ui.toast('err', '口令太短', '请设置至少8位的会话口令');
+          return;
+        }
+        
+        var days = parseInt(document.querySelector('.duration-btn.selected').dataset.days);
+        
+        var selectedApps = getSelectedApps();
+        if (selectedApps.length === 0) {
+          selectedApps = ['Excel', '邮件', '浏览器'];
+        }
+        
+        FDE.session.create({
+          password: password,
+          durationHours: days * 24,
+          retentionDays: 7,
+          appWhitelist: selectedApps,
+          captureKeyboardText: true,
+          roleName: roleName
+        }).then(function(data) {
+          document.getElementById('new-session-modal').classList.add('hidden');
+          FDE.state.activeSessionId = data.session.id;
+          FDE.state.activePassword = password;
+          FDE.state.sessionPasswordCache[data.session.id] = password;
+          FDE.storage.save();
+          
+          return FDE.session.start(data.session.id, password);
+        }).then(function() {
+          FDE.ui.toast('ok', '会话创建成功', '正在启动观察...');
+          loadSessions();
+        }).catch(function(err) {
+          FDE.ui.toast('err', '创建失败', err.message);
+        });
+      });
+      
+      document.getElementById('session-search').addEventListener('input', function(e) {
+        renderSessions(e.target.value.toLowerCase());
+      });
+      
+      // ===== SOCIAL LOGIN BUTTONS =====
+      document.getElementById('btn-wechat-login').addEventListener('click', function() {
+        FDE.ui.toast('info', '功能开发中', '微信登录功能即将上线，请使用邮箱登录');
+      });
+      
+      document.getElementById('btn-alipay-login').addEventListener('click', function() {
+        FDE.ui.toast('info', '功能开发中', '支付宝登录功能即将上线，请使用邮箱登录');
+      });
+      
+      // ===== HEADER BUTTONS =====
+      document.getElementById('header-notif-btn').addEventListener('click', function() {
+        showNotificationPanel();
+      });
+      
+      document.getElementById('header-settings-btn').addEventListener('click', function() {
+        window.location.href = '/settings.html';
+      });
+      
+      // User avatar dropdown
+      var userAvatarEl = document.getElementById('user-avatar');
+      var userDropdown = document.getElementById('user-dropdown');
+      var dropdownOpen = false;
+      
+      userAvatarEl.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownOpen = !dropdownOpen;
+        if (dropdownOpen) {
+          userDropdown.classList.remove('hidden');
+          document.getElementById('dropdown-user-name').textContent = FDE.state.user.name || '用户';
+          document.getElementById('dropdown-user-email').textContent = FDE.state.user.email || '';
+          lucide.createIcons();
+        } else {
+          userDropdown.classList.add('hidden');
+        }
+      });
+      
+      document.addEventListener('click', function() {
+        if (dropdownOpen) {
+          dropdownOpen = false;
+          userDropdown.classList.add('hidden');
+        }
+      });
+      
+      document.getElementById('dropdown-logout').addEventListener('click', function(e) {
+        e.preventDefault();
+        FDE.auth.logout();
+        window.location.reload();
+      });
+      
+      // ===== AI ROLE RECOGNITION (CALLS BACKEND API) =====
+      var roleInput = document.getElementById('session-role');
+      var roleSuggestions = document.getElementById('role-suggestions');
+      var roleAnalysisText = document.getElementById('role-analysis-text');
+      var roleSuggestedApps = document.getElementById('role-suggested-apps');
+      var roleTypingTimer;
+      
+      roleInput.addEventListener('input', function() {
+        clearTimeout(roleTypingTimer);
+        var value = roleInput.value.trim();
+        
+        if (value.length < 1) {
+          roleSuggestions.classList.add('hidden');
+          return;
+        }
+        
+        roleTypingTimer = setTimeout(function() {
+          roleAnalysisText.innerHTML = '正在分析 <strong>' + FDE.utils.escapeHtml(value) + '</strong> 的职业信息...';
+          roleSuggestedApps.innerHTML = '<div class="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>';
+          roleSuggestions.classList.remove('hidden');
+          
+          FDE.http.post('/api/role/search', { query: value }).then(function(data) {
+            var scope = data.scope || [];
+            var tools = data.tools || [];
+            var description = data.description || '';
+            
+            var displayName = value;
+            if (data.results && data.results.length > 0) {
+              displayName = data.results[0].title || value;
+              if (!description) description = data.results[0].description || '';
+            }
+            
+            var descText = description || ('检测到您可能是 <strong>' + FDE.utils.escapeHtml(displayName) + '</strong>');
+            if (scope.length > 0) {
+              descText += '，工作范围包括 ' + scope.slice(0, 3).join('、') + ' 等。';
+            } else if (tools.length > 0) {
+              descText += '，工作中常用 ' + tools.slice(0, 3).join('、') + ' 等工具。';
+            } else {
+              descText += '，建议观察 Excel、邮件、浏览器等常见办公应用。';
+            }
+            roleAnalysisText.innerHTML = descText;
+            
+            var appsToShow = tools.length > 0 ? tools : ['Excel', '邮件', '浏览器'];
+            var appsHtml = '';
+            appsToShow.forEach(function(app) {
+              appsHtml += '<span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">' + FDE.utils.escapeHtml(app) + '</span>';
+            });
+            roleSuggestedApps.innerHTML = appsHtml;
+            roleSuggestions.classList.remove('hidden');
+            
+            // Auto-select suggested apps if they exist in the grid
+            document.querySelectorAll('.app-tag').forEach(function(tag) {
+              var appName = tag.getAttribute('data-app');
+              appsToShow.forEach(function(suggestedApp) {
+                if (appName && suggestedApp.toLowerCase().indexOf(appName.toLowerCase()) !== -1 ||
+                    appName && appName.toLowerCase().indexOf(suggestedApp.toLowerCase()) !== -1) {
+                  tag.classList.add('selected', 'bg-blue-50', 'text-blue-600', 'border-blue-200');
+                  tag.classList.remove('bg-gray-100', 'text-gray-600', 'border-transparent');
+                }
+              });
+            });
+          }).catch(function(err) {
+            roleAnalysisText.innerHTML = 'AI 分析服务暂不可用，建议观察 Excel、邮件、浏览器等常见办公应用。';
+            roleSuggestedApps.innerHTML = '<span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">Excel</span><span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">邮件</span><span class="px-2 py-1 bg-white text-blue-600 rounded-lg text-xs border border-blue-200">浏览器</span>';
+          });
+        }, 600);
+      });
+      
+      // ===== APP SCANNING & SELECTION (CALLS BACKEND API) =====
+      var btnScanApps = document.getElementById('btn-scan-apps');
+      var appScanProgress = document.getElementById('app-scan-progress');
+      var scanProgressBar = document.getElementById('scan-progress-bar');
+      var appSelectionGrid = document.getElementById('app-selection-grid');
+      var allScannedApps = [];
+      
+      // Toggle app selection
+      appSelectionGrid.addEventListener('click', function(e) {
+        var tag = e.target.closest('.app-tag');
+        if (!tag) return;
+        
+        if (tag.classList.contains('selected')) {
+          tag.classList.remove('selected', 'bg-blue-50', 'text-blue-600', 'border-blue-200');
+          tag.classList.add('bg-gray-100', 'text-gray-600', 'border-transparent');
+        } else {
+          tag.classList.add('selected', 'bg-blue-50', 'text-blue-600', 'border-blue-200');
+          tag.classList.remove('bg-gray-100', 'text-gray-600', 'border-transparent');
+        }
+      });
+      
+      // Scan local apps (real backend API)
+      btnScanApps.addEventListener('click', function() {
+        appScanProgress.classList.remove('hidden');
+        btnScanApps.disabled = true;
+        
+        FDE.http.get('/api/system/apps').then(function(data) {
+          var apps = data.apps || [];
+          allScannedApps = apps;
+          
+          appScanProgress.classList.add('hidden');
+          btnScanApps.disabled = false;
+          
+          // Clear existing tags except defaults
+          appSelectionGrid.innerHTML = '';
+          
+          // Add all scanned apps
+          apps.forEach(function(app) {
+            var newTag = document.createElement('button');
+            newTag.type = 'button';
+            newTag.className = 'app-tag px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm border border-transparent hover:bg-gray-200 transition-colors';
+            newTag.setAttribute('data-app', app.name);
+            newTag.setAttribute('data-category', app.category || '');
+            newTag.textContent = app.name;
+            appSelectionGrid.appendChild(newTag);
+          });
+          
+          FDE.ui.toast('ok', '扫描完成', '发现 ' + apps.length + ' 个已安装应用');
+        }).catch(function(err) {
+          appScanProgress.classList.add('hidden');
+          btnScanApps.disabled = false;
+          FDE.ui.toast('err', '扫描失败', err.message || '无法获取本机应用列表');
+        });
+      });
+      
+      // App search input listener
+      document.getElementById('app-search').addEventListener('input', function(e) {
+        filterApps(e.target.value);
+      });
+      
+      // App search filter
+      function filterApps(keyword) {
+        var tags = appSelectionGrid.querySelectorAll('.app-tag');
+        var lowerKeyword = keyword.toLowerCase();
+        tags.forEach(function(tag) {
+          var appName = tag.getAttribute('data-app') || '';
+          if (lowerKeyword === '' || appName.toLowerCase().indexOf(lowerKeyword) !== -1) {
+            tag.style.display = '';
+          } else {
+            tag.style.display = 'none';
+          }
+        });
+      }
+      
+      // ===== NOTIFICATION PANEL =====
+      function showNotificationPanel() {
+        var panel = document.getElementById('notification-panel');
+        if (!panel) {
+          panel = document.createElement('div');
+          panel.id = 'notification-panel';
+          panel.className = 'fixed inset-y-0 right-0 w-80 bg-white shadow-xl border-l border-gray-200 z-50 transform translate-x-full transition-transform duration-300';
+          panel.innerHTML = `
+            <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+              <h3 class="font-semibold text-gray-800">消息通知</h3>
+              <button id="close-notif-panel" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+              </button>
+            </div>
+            <div class="overflow-y-auto h-full pb-20">
+              <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-gray-800">会话观察完成</div>
+                    <div class="text-xs text-gray-500 mt-1">库存状态问答 Agent 已完成观察，AI 评分 85 分</div>
+                    <div class="text-xs text-gray-400 mt-1">10 分钟前</div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-gray-800">报告已生成</div>
+                    <div class="text-xs text-gray-500 mt-1">客户信息搬运助手 的分析报告已生成</div>
+                    <div class="text-xs text-gray-400 mt-1">1 小时前</div>
+                  </div>
+                </div>
+              </div>
+              <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+                <div class="flex items-start gap-3">
+                  <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-600"></i>
+                  </div>
+                  <div>
+                    <div class="text-sm font-medium text-gray-800">系统提醒</div>
+                    <div class="text-xs text-gray-500 mt-1">会话口令将于 3 天后过期，请及时备份数据</div>
+                    <div class="text-xs text-gray-400 mt-1">2 小时前</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(panel);
+          lucide.createIcons();
+          
+          document.getElementById('close-notif-panel').addEventListener('click', function() {
+            panel.classList.add('translate-x-full');
+          });
+        }
+        
+        panel.classList.remove('translate-x-full');
+      }
+      
+      // ===== CREATE SESSION WITH SELECTED APPS =====
+      function getSelectedApps() {
+        var apps = [];
+        document.querySelectorAll('.app-tag.selected').forEach(function(tag) {
+          apps.push(tag.getAttribute('data-app'));
+        });
+        return apps;
+      }
+      
+      function showSessions() {
+        authSection.classList.add('hidden');
+        sessionsSection.classList.remove('hidden');
+        userAvatar.classList.remove('hidden');
+        userAvatar.textContent = FDE.state.user.name.charAt(0).toUpperCase();
+        loadSessions();
+      }
+      
+      function loadSessions() {
+        FDE.session.list().then(function() {
+          renderSessions('');
+        }).catch(function() {});
+      }
+      
+      function renderSessions(keyword) {
+        var container = document.getElementById('sessions-list');
+        var sessions = FDE.state.sessions;
+        
+        if (keyword) {
+          sessions = sessions.filter(function(s) {
+            var id = (s.id || '').toLowerCase();
+            var name = (s.name || '').toLowerCase();
+            return id.indexOf(keyword) !== -1 || name.indexOf(keyword) !== -1;
+          });
+        }
+        
+        if (sessions.length === 0) {
+          container.innerHTML = '<div class="text-center py-12 text-gray-400"><i data-lucide="search" class="w-12 h-12 mx-auto mb-4 opacity-50"></i><p>暂无会话，点击下方按钮创建</p></div>';
+          lucide.createIcons();
+          return;
+        }
+        
+        var html = '';
+        sessions.forEach(function(s) {
+          var statusText = '待开始';
+          var statusClass = '';
+          var statusColor = 'bg-gray-400';
+          
+          if (s.status === 'recording') { statusText = '观察中'; statusClass = 'status-recording'; statusColor = 'bg-red-500'; }
+          else if (s.status === 'paused') { statusText = '已暂停'; statusClass = 'status-paused'; statusColor = 'bg-yellow-500'; }
+          else if (s.status === 'finalized') { statusText = '已完成'; statusClass = 'status-finalized'; statusColor = 'bg-green-500'; }
+          
+          var eventCount = s.eventCount || 0;
+          var progress = s.progress || 0;
+          var whitelist = (s.scope && s.scope.appWhitelist) ? s.scope.appWhitelist : (s.appWhitelist || []);
+          
+          html += `
+            <div class="session-card bg-white border border-gray-200 rounded-xl p-4 card-hover relative group" data-session-id="${FDE.utils.escapeHtml(s.id)}">
+              <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-3 cursor-pointer flex-1" onclick="openSession('${FDE.utils.escapeHtml(s.id)}')">
+                  <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
+                    <i data-lucide="activity" class="w-5 h-5 text-blue-600"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-semibold text-gray-800">${FDE.utils.escapeHtml(s.name || ('会话 ' + s.id.slice(-8)))}</h3>
+                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                      <span class="${statusClass} status-dot"></span>
+                      <span>${statusText}</span>
+                      <span class="text-gray-300">|</span>
+                      <span>${eventCount} 条事件</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="text-right">
+                    <div class="text-xs text-gray-400 mb-1">进度</div>
+                    <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div class="h-full bg-blue-500 rounded-full" style="width:${progress}%"></div>
+                    </div>
+                  </div>
+                  <button class="session-delete-btn p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100" data-session-id="${FDE.utils.escapeHtml(s.id)}" title="删除会话">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-gray-400 cursor-pointer" onclick="openSession('${FDE.utils.escapeHtml(s.id)}')">
+                <span>${FDE.utils.formatRelativeTime(s.createdAtMs || s.createdAt)}</span>
+                <span>观察范围: ${whitelist.slice(0, 3).join(', ')}</span>
+              </div>
+            </div>
+          `;
+        });
+        
+        container.innerHTML = html;
+        lucide.createIcons();
+        
+        // Delete button handlers
+        container.querySelectorAll('.session-delete-btn').forEach(function(btn) {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var sessionId = this.getAttribute('data-session-id');
+            if (confirm('确定要删除此会话吗？删除后无法恢复。')) {
+              FDE.session.delete(sessionId).then(function() {
+                FDE.ui.toast('ok', '删除成功', '会话已删除');
+                renderSessions(document.getElementById('session-search').value.toLowerCase());
+              }).catch(function(err) {
+                FDE.ui.toast('err', '删除失败', err.message);
+              });
+            }
+          });
+        });
+      }
+      
+      function openSession(sessionId) {
+        var password = FDE.state.sessionPasswordCache[sessionId];
+        if (!password) {
+          password = prompt('请输入会话口令：');
+          if (!password) return;
+          FDE.state.sessionPasswordCache[sessionId] = password;
+        }
+        
+        FDE.state.activeSessionId = sessionId;
+        FDE.state.activePassword = password;
+        FDE.storage.save();
+        
+        window.location.href = '/dashboard.html';
+      }
+      
+      // Auto-show sessions if already logged in
+      if (FDE.auth.isAuthenticated()) {
+        showSessions();
+      }
+    });
+  </script>
+</body>
+</html>

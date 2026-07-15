@@ -1,0 +1,7 @@
+# RapidOCR (PaddleOCR-ONNX) —— 离线 OCR 服务
+# 首次运行时 RapidOCR 会自动下载 15MB 左右的 ONNX 模型文件并缓存到本地
+# 依赖总量：Python 侧约 80MB，首次调用时自动下载模型约 15MB
+rapidocr_onnxruntime>=1.3.0
+opencv-python-headless>=4.5.0
+numpy>=1.19.5
+pillow>=9.0.0

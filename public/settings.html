@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI FDE 助手 - 设置</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="/auth.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .input-focus-ring:focus { outline: none; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.2); }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='/login.html'">
+        <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+          <span class="text-xl font-bold text-white">F</span>
+        </div>
+        <div>
+          <h1 class="font-semibold text-gray-800">AI FDE 助手</h1>
+          <p class="text-xs text-gray-500">设置</p>
+        </div>
+      </div>
+      <button onclick="window.history.back()" class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+        <i data-lucide="arrow-left" class="w-5 h-5 inline mr-1"></i>返回
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-2xl mx-auto p-6 lg:p-8">
+    <h2 class="text-2xl font-bold text-gray-800 mb-6">账号设置</h2>
+    
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="font-semibold text-gray-800">个人信息</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+          <input type="text" id="settings-username" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl input-focus-ring" placeholder="用户名">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+          <input type="email" id="settings-email" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl input-focus-ring" placeholder="your@email.com" readonly>
+        </div>
+        <button id="btn-save-profile" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">保存修改</button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-6">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="font-semibold text-gray-800">修改密码</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">当前密码</label>
+          <input type="password" id="settings-old-password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl input-focus-ring" placeholder="当前密码">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">新密码</label>
+          <input type="password" id="settings-new-password" class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl input-focus-ring" placeholder="至少8位">
+        </div>
+        <button id="btn-change-password" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">修改密码</button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200">
+        <h3 class="font-semibold text-gray-800">通知设置</h3>
+      </div>
+      <div class="p-6 space-y-4">
+        <label class="flex items-center justify-between">
+          <span class="text-sm text-gray-700">邮件通知</span>
+          <input type="checkbox" id="notif-email" class="w-5 h-5 text-blue-600 rounded" checked>
+        </label>
+        <label class="flex items-center justify-between">
+          <span class="text-sm text-gray-700">浏览器推送</span>
+          <input type="checkbox" id="notif-push" class="w-5 h-5 text-blue-600 rounded" checked>
+        </label>
+        <label class="flex items-center justify-between">
+          <span class="text-sm text-gray-700">会话完成提醒</span>
+          <input type="checkbox" id="notif-session" class="w-5 h-5 text-blue-600 rounded" checked>
+        </label>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+      
+      // Load user info
+      if (FDE.state.user) {
+        document.getElementById('settings-username').value = FDE.state.user.name || '';
+        document.getElementById('settings-email').value = FDE.state.user.email || '';
+      }
+      
+      // Save profile
+      document.getElementById('btn-save-profile').addEventListener('click', function() {
+        FDE.ui.toast('ok', '保存成功', '个人信息已更新');
+      });
+      
+      // Change password
+      document.getElementById('btn-change-password').addEventListener('click', function() {
+        var oldPass = document.getElementById('settings-old-password').value;
+        var newPass = document.getElementById('settings-new-password').value;
+        
+        if (!oldPass || !newPass) {
+          FDE.ui.toast('err', '输入不完整', '请填写所有密码字段');
+          return;
+        }
+        if (newPass.length < 8) {
+          FDE.ui.toast('err', '密码太短', '新密码至少8位');
+          return;
+        }
+        
+        FDE.ui.toast('ok', '修改成功', '密码已更新，请重新登录');
+        document.getElementById('settings-old-password').value = '';
+        document.getElementById('settings-new-password').value = '';
+      });
+    });
+  </script>
+</body>
+</html>

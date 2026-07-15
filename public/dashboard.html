@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI FDE 助手 - 观察仪表盘</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+  <script src="/auth.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+    
+    .card-hover {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    
+    .card-hover:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-recording { background-color: #ef4444; animation: pulse 2s infinite; }
+    .status-paused { background-color: #f59e0b; }
+    .status-finalized { background-color: #10b981; }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .ring-chart {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+    
+    .ring-chart canvas {
+      transform: rotate(-90deg);
+    }
+    
+    .ring-chart .center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    
+    .timeline-line {
+      position: absolute;
+      left: 20px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: #e2e8f0;
+    }
+    
+    .event-type-tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+    
+    .type-click { background-color: #dbeafe; color: #2563eb; }
+    .type-keyboard { background-color: #fce7f3; color: #db2777; }
+    .type-screenshot { background-color: #dcfce7; color: #16a34a; }
+    .type-app-switch { background-color: #fef3c7; color: #d97706; }
+    .type-file { background-color: #e0e7ff; color: #6366f1; }
+    
+    .progress-bar {
+      height: 8px;
+      background-color: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+    
+    .animate-pulse-dot {
+      animation: pulseDot 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.5; }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- ===== DASHBOARD HEADER ===== -->
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.href='/login.html'" title="返回会话列表">
+          <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
+            <span class="text-xl font-bold text-white">F</span>
+          </div>
+          <div>
+            <h1 class="font-semibold text-gray-800">AI FDE 助手</h1>
+            <p class="text-xs text-gray-500">观察仪表盘</p>
+          </div>
+        </div>
+        
+        <div class="hidden md:flex items-center gap-4">
+          <button class="flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
+            <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+            仪表盘
+          </button>
+          <button class="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+            <i data-lucide="activity" class="w-5 h-5"></i>
+            事件日志
+          </button>
+          <button class="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+            <i data-lucide="file-text" class="w-5 h-5"></i>
+            AI 报告
+          </button>
+          <button class="flex items-center gap-2 px-4 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors">
+            <i data-lucide="settings" class="w-5 h-5"></i>
+            设置
+          </button>
+        </div>
+      </div>
+      
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-full text-sm">
+          <span class="status-recording status-dot"></span>
+          <span id="session-status">观察中</span>
+        </div>
+        
+        <div class="relative">
+          <button id="dash-notif-btn" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+            <i data-lucide="bell" class="w-5 h-5 text-gray-600"></i>
+          </button>
+          <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+        </div>
+        
+        <div id="dash-user-avatar" class="w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:bg-blue-700 transition-colors relative">
+          U
+          <!-- User dropdown menu -->
+          <div id="dash-user-dropdown" class="hidden absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-200 py-2 z-50">
+            <div class="px-4 py-2 border-b border-gray-100">
+              <div class="font-medium text-gray-800" id="dash-dropdown-user-name">用户</div>
+              <div class="text-xs text-gray-500" id="dash-dropdown-user-email">user@example.com</div>
+            </div>
+            <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              <i data-lucide="user" class="w-4 h-4"></i>个人资料
+            </a>
+            <a href="#" class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+              <i data-lucide="settings" class="w-4 h-4"></i>账号设置
+            </a>
+            <div class="border-t border-gray-100 mt-1 pt-1">
+              <a href="#" id="dash-dropdown-logout" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                <i data-lucide="log-out" class="w-4 h-4"></i>退出登录
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== DASHBOARD MAIN CONTENT ===== -->
+  <main class="p-6 lg:p-8">
+    <!-- Session Status Panel -->
+    <div class="mb-8">
+      <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
+        <div class="flex items-start justify-between">
+          <div>
+            <h2 class="text-xl font-bold mb-2" id="session-name">客户信息搬运助手</h2>
+            <p class="text-blue-100 text-sm">第 2 天 / 3 天 · 实时更新中</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button id="btn-start" class="px-4 py-2 bg-white text-blue-600 rounded-lg font-medium text-sm hover:bg-blue-50 transition-colors">
+              <i data-lucide="play" class="w-4 h-4 inline mr-1"></i>开始观察
+            </button>
+            <button id="btn-pause" class="px-4 py-2 bg-white/20 text-white rounded-lg font-medium text-sm hover:bg-white/30 transition-colors">
+              <i data-lucide="pause" class="w-4 h-4 inline mr-1"></i>暂停观察
+            </button>
+            <button id="btn-end" class="px-4 py-2 bg-red-500 text-white rounded-lg font-medium text-sm hover:bg-red-600 transition-colors">
+              <i data-lucide="square" class="w-4 h-4 inline mr-1"></i>结束观察
+            </button>
+          </div>
+        </div>
+        
+        <div class="mt-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div>
+            <div class="text-blue-100 text-sm mb-1">运行时间</div>
+            <div class="text-2xl font-bold" id="runtime">16h 32m</div>
+          </div>
+          <div>
+            <div class="text-blue-100 text-sm mb-1">事件总数</div>
+            <div class="text-2xl font-bold" id="event-count">1,247</div>
+          </div>
+          <div>
+            <div class="text-blue-100 text-sm mb-1">活跃应用</div>
+            <div class="text-2xl font-bold" id="active-app">Excel</div>
+          </div>
+          <div>
+            <div class="text-blue-100 text-sm mb-1">AI 评分</div>
+            <div class="text-2xl font-bold" id="ai-score">85</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- LEFT COLUMN: Event Stream -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Event Timeline -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-semibold text-gray-800">实时事件流</h3>
+              <p class="text-sm text-gray-500">基于 WebSocket 实时更新</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span class="text-xs text-gray-500">已连接</span>
+              </div>
+              <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <i data-lucide="refresh-cw" class="w-4 h-4 text-gray-500"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="relative max-h-96 overflow-y-auto scrollbar-thin" id="events-container">
+            <div class="timeline-line"></div>
+            <!-- Events will be injected here -->
+          </div>
+        </div>
+
+        <!-- Performance Charts -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- CPU/Memory Usage -->
+          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <h3 class="font-semibold text-gray-800 mb-4">系统资源</h3>
+            <div class="space-y-4">
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span class="text-gray-600">CPU 使用率</span>
+                  <span class="font-mono text-gray-800" id="cpu-usage">42%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-blue-500" id="cpu-bar" style="width: 42%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span class="text-gray-600">内存使用</span>
+                  <span class="font-mono text-gray-800" id="memory-usage">68%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-purple-500" id="memory-bar" style="width: 68%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-sm mb-2">
+                  <span class="text-gray-600">网络延迟</span>
+                  <span class="font-mono text-gray-800" id="latency">12ms</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-green-500" id="latency-bar" style="width: 12%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Event Rate Chart -->
+          <div class="bg-white rounded-2xl border border-gray-200 p-6">
+            <h3 class="font-semibold text-gray-800 mb-4">事件速率</h3>
+            <div class="h-40">
+              <canvas id="eventRateChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Opportunities -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-6">
+            <div>
+              <h3 class="font-semibold text-gray-800">AI 机会评分</h3>
+              <p class="text-sm text-gray-500">基于观察数据的自动化潜力分析</p>
+            </div>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium text-sm hover:bg-blue-700 transition-colors">
+              生成报告
+            </button>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Opportunity Card 1 -->
+            <div class="border border-gray-200 rounded-xl p-5 card-hover cursor-pointer border-l-4 border-red-500">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium px-2 py-1 bg-red-50 text-red-600 rounded-full">高优先级</span>
+                <span class="text-sm text-gray-500">每周 3.5h</span>
+              </div>
+              <h4 class="font-semibold text-gray-800 mb-3">客户信息搬运助手</h4>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">自动化潜力</span>
+                  <span class="font-mono text-blue-600">92%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-blue-500" style="width: 92%"></div>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">实现难度</span>
+                  <span class="font-mono text-gray-600">35%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-gray-400" style="width: 35%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opportunity Card 2 -->
+            <div class="border border-gray-200 rounded-xl p-5 card-hover cursor-pointer border-l-4 border-red-500">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium px-2 py-1 bg-red-50 text-red-600 rounded-full">高优先级</span>
+                <span class="text-sm text-gray-500">每周 2.0h</span>
+              </div>
+              <h4 class="font-semibold text-gray-800 mb-3">库存状态问答 Agent</h4>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">自动化潜力</span>
+                  <span class="font-mono text-blue-600">85%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-blue-500" style="width: 85%"></div>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">实现难度</span>
+                  <span class="font-mono text-gray-600">45%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-gray-400" style="width: 45%"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Opportunity Card 3 -->
+            <div class="border border-gray-200 rounded-xl p-5 card-hover cursor-pointer border-l-4 border-yellow-500">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-xs font-medium px-2 py-1 bg-yellow-50 text-yellow-600 rounded-full">中优先级</span>
+                <span class="text-sm text-gray-500">每周 1.5h</span>
+              </div>
+              <h4 class="font-semibold text-gray-800 mb-3">自动日报助手</h4>
+              <div class="space-y-2">
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">自动化潜力</span>
+                  <span class="font-mono text-blue-600">90%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-blue-500" style="width: 90%"></div>
+                </div>
+                <div class="flex justify-between text-xs">
+                  <span class="text-gray-500">实现难度</span>
+                  <span class="font-mono text-gray-600">30%</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill bg-gray-400" style="width: 30%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Session Details & AI Dashboard -->
+      <div class="space-y-6">
+        <!-- AI Scoring Ring Chart -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <h3 class="font-semibold text-gray-800 mb-6">AI 替代潜力评分</h3>
+          <div class="flex justify-center mb-6">
+            <div class="ring-chart">
+              <canvas id="aiPotentialChart"></canvas>
+              <div class="center-text">
+                <div class="text-3xl font-bold text-gray-800">85</div>
+                <div class="text-xs text-gray-500">综合评分</div>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">任务可预测性</span>
+              <span class="font-mono text-gray-800">92%</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">数据可获取性</span>
+              <span class="font-mono text-gray-800">78%</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">流程标准化</span>
+              <span class="font-mono text-gray-800">88%</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-gray-600">风险可控性</span>
+              <span class="font-mono text-gray-800">82%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Task Clustering -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <h3 class="font-semibold text-gray-800 mb-4">任务聚类</h3>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+              <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                <i data-lucide="copy" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-800">数据录入</div>
+                <div class="text-xs text-gray-500">35% · 436 次</div>
+              </div>
+              <div class="w-16 h-1.5 bg-blue-500 rounded-full"></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
+              <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                <i data-lucide="file-text" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-800">文档处理</div>
+                <div class="text-xs text-gray-500">28% · 349 次</div>
+              </div>
+              <div class="w-16 h-1.5 bg-purple-500 rounded-full" style="width: 70%"></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
+              <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
+                <i data-lucide="message-circle" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-800">沟通协作</div>
+                <div class="text-xs text-gray-500">22% · 274 次</div>
+              </div>
+              <div class="w-16 h-1.5 bg-green-500 rounded-full" style="width: 55%"></div>
+            </div>
+            <div class="flex items-center gap-3 p-3 bg-orange-50 rounded-lg">
+              <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                <i data-lucide="search" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-sm font-medium text-gray-800">信息检索</div>
+                <div class="text-xs text-gray-500">15% · 188 次</div>
+              </div>
+              <div class="w-16 h-1.5 bg-orange-500 rounded-full" style="width: 38%"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Connection Stats -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <h3 class="font-semibold text-gray-800 mb-4">连接统计</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="text-center p-4 bg-gray-50 rounded-xl">
+              <div class="text-2xl font-bold text-gray-800" id="connection-count">12</div>
+              <div class="text-xs text-gray-500">活跃连接</div>
+            </div>
+            <div class="text-center p-4 bg-gray-50 rounded-xl">
+              <div class="text-2xl font-bold text-gray-800" id="event-rate">42/s</div>
+              <div class="text-xs text-gray-500">事件速率</div>
+            </div>
+            <div class="text-center p-4 bg-gray-50 rounded-xl">
+              <div class="text-2xl font-bold text-green-600">100%</div>
+              <div class="text-xs text-gray-500">服务状态</div>
+            </div>
+            <div class="text-center p-4 bg-gray-50 rounded-xl">
+              <div class="text-2xl font-bold text-gray-800" id="uptime">99.9%</div>
+              <div class="text-xs text-gray-500">可用性</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Workflow Blueprint Preview -->
+        <div class="bg-white rounded-2xl border border-gray-200 p-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-semibold text-gray-800">工作流蓝图</h3>
+            <button class="text-xs text-blue-600 hover:text-blue-700">查看详情</button>
+          </div>
+          <div class="relative p-4 bg-gray-50 rounded-xl">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">1</div>
+              <span class="text-sm text-gray-700">用户触发</span>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <i data-lucide="arrow-down" class="w-4 h-4 text-gray-400 ml-4"></i>
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+              <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">2</div>
+              <span class="text-sm text-gray-700">数据采集</span>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <i data-lucide="arrow-down" class="w-4 h-4 text-gray-400 ml-4"></i>
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+              <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">3</div>
+              <span class="text-sm text-gray-700">AI 分析</span>
+            </div>
+            <div class="flex items-center gap-2 mt-3">
+              <i data-lucide="arrow-down" class="w-4 h-4 text-gray-400 ml-4"></i>
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+              <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white text-xs font-bold">4</div>
+              <span class="text-sm text-gray-700">生成报告</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ===== EVENT DETAIL MODAL ===== -->
+  <div id="event-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden">
+      <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+        <h3 class="text-lg font-semibold text-gray-800">事件详情</h3>
+        <button id="close-event-modal" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="flex items-center gap-3">
+          <span class="event-type-tag type-click" id="modal-event-type">点击事件</span>
+          <span class="text-sm text-gray-500" id="modal-event-time">2024-01-15 10:30:22</span>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">应用名称</label>
+          <div class="p-3 bg-gray-50 rounded-lg text-gray-800" id="modal-app-name">Excel</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">事件摘要</label>
+          <div class="p-3 bg-gray-50 rounded-lg text-gray-800" id="modal-summary">点击单元格 B2，复制客户名称</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">持续时间</label>
+          <div class="p-3 bg-gray-50 rounded-lg text-gray-800" id="modal-duration">2.3 秒</div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">屏幕位置</label>
+          <div class="p-3 bg-gray-50 rounded-lg text-gray-800" id="modal-position">x: 450, y: 230, w: 120, h: 30</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      lucide.createIcons();
+      
+      var sessionId = FDE.state.activeSessionId;
+      var password = FDE.state.activePassword;
+      
+      if (!sessionId) {
+        window.location.href = '/login.html';
+        return;
+      }
+      
+      // Load real session info
+      loadSessionInfo(sessionId, password);
+      
+      // Initialize Charts
+      initCharts();
+      
+      // Connect WebSocket
+      FDE.ws.connect(sessionId);
+      
+      // Listen for events
+      FDE.ws.on('event', function(data) {
+        addEvent(data);
+      });
+      
+      FDE.ws.on('session_update', function(data) {
+        updateSessionStatus(data);
+      });
+      
+      // Load real events from API
+      loadRealEvents(sessionId, password);
+      
+      // Session control buttons
+      document.getElementById('btn-start').addEventListener('click', function() {
+        FDE.session.start(sessionId, password).then(function() {
+          FDE.ui.toast('ok', '观察已开始', '会话正在录制中');
+          updateSessionUI('recording');
+        }).catch(function(err) {
+          FDE.ui.toast('err', '操作失败', err.message);
+        });
+      });
+      
+      document.getElementById('btn-pause').addEventListener('click', function() {
+        FDE.session.pause(sessionId, password).then(function() {
+          FDE.ui.toast('info', '观察已暂停', '会话已暂停');
+          updateSessionUI('paused');
+        }).catch(function(err) {
+          FDE.ui.toast('err', '操作失败', err.message);
+        });
+      });
+      
+      document.getElementById('btn-end').addEventListener('click', function() {
+        if (confirm('确定要结束观察并生成报告吗？')) {
+          FDE.session.finalize(sessionId, password).then(function() {
+            FDE.ui.toast('ok', '观察已结束', '正在生成分析报告...');
+            updateSessionUI('finalized');
+          }).catch(function(err) {
+            FDE.ui.toast('err', '操作失败', err.message);
+          });
+        }
+      });
+      
+      // Close modal
+      document.getElementById('close-event-modal').addEventListener('click', function() {
+        document.getElementById('event-modal').classList.add('hidden');
+      });
+      
+      // ===== HEADER BUTTONS =====
+      document.getElementById('dash-notif-btn').addEventListener('click', function() {
+        showDashboardNotificationPanel();
+      });
+      
+      // User avatar dropdown
+      var dashUserAvatar = document.getElementById('dash-user-avatar');
+      var dashUserDropdown = document.getElementById('dash-user-dropdown');
+      var dashDropdownOpen = false;
+      
+      dashUserAvatar.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dashDropdownOpen = !dashDropdownOpen;
+        if (dashDropdownOpen) {
+          dashUserDropdown.classList.remove('hidden');
+          document.getElementById('dash-dropdown-user-name').textContent = FDE.state.user.name || '用户';
+          document.getElementById('dash-dropdown-user-email').textContent = FDE.state.user.email || '';
+          lucide.createIcons();
+        } else {
+          dashUserDropdown.classList.add('hidden');
+        }
+      });
+      
+      document.addEventListener('click', function() {
+        if (dashDropdownOpen) {
+          dashDropdownOpen = false;
+          dashUserDropdown.classList.add('hidden');
+        }
+      });
+      
+      document.getElementById('dash-dropdown-logout').addEventListener('click', function(e) {
+        e.preventDefault();
+        FDE.auth.logout();
+        window.location.href = '/login.html';
+      });
+      
+      // Settings button in nav
+      document.querySelectorAll('button').forEach(function(btn) {
+        if (btn.textContent.indexOf('设置') !== -1 && !btn.id) {
+          btn.addEventListener('click', function() {
+            window.location.href = '/settings.html';
+          });
+        }
+      });
+    });
+    
+    // ===== NOTIFICATION PANEL =====
+    function showDashboardNotificationPanel() {
+      var panel = document.getElementById('dash-notification-panel');
+      if (!panel) {
+        panel = document.createElement('div');
+        panel.id = 'dash-notification-panel';
+        panel.className = 'fixed inset-y-0 right-0 w-80 bg-white shadow-xl border-l border-gray-200 z-50 transform translate-x-full transition-transform duration-300';
+        panel.innerHTML = `
+          <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h3 class="font-semibold text-gray-800">消息通知</h3>
+            <button id="close-dash-notif-panel" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+              <i data-lucide="x" class="w-5 h-5 text-gray-500"></i>
+            </button>
+          </div>
+          <div class="overflow-y-auto h-full pb-20">
+            <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-800">会话观察完成</div>
+                  <div class="text-xs text-gray-500 mt-1">库存状态问答 Agent 已完成观察，AI 评分 85 分</div>
+                  <div class="text-xs text-gray-400 mt-1">10 分钟前</div>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-800">报告已生成</div>
+                  <div class="text-xs text-gray-500 mt-1">客户信息搬运助手 的分析报告已生成</div>
+                  <div class="text-xs text-gray-400 mt-1">1 小时前</div>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <i data-lucide="alert-triangle" class="w-4 h-4 text-yellow-600"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-800">系统提醒</div>
+                  <div class="text-xs text-gray-500 mt-1">会话口令将于 3 天后过期，请及时备份数据</div>
+                  <div class="text-xs text-gray-400 mt-1">2 小时前</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(panel);
+        lucide.createIcons();
+        
+        document.getElementById('close-dash-notif-panel').addEventListener('click', function() {
+          panel.classList.add('translate-x-full');
+        });
+      }
+      
+      panel.classList.remove('translate-x-full');
+    }
+    
+    var eventRateChart;
+    var aiPotentialChart;
+    
+    function initCharts() {
+      // Event Rate Chart
+      var ctx1 = document.getElementById('eventRateChart').getContext('2d');
+      eventRateChart = new Chart(ctx1, {
+        type: 'line',
+        data: {
+          labels: ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'],
+          datasets: [{
+            label: '事件/分钟',
+            data: [35, 65, 80, 40, 55, 70, 50, 30, 20],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#3b82f6'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y: { grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
+          }
+        }
+      });
+      
+      // AI Potential Ring Chart
+      var ctx2 = document.getElementById('aiPotentialChart').getContext('2d');
+      aiPotentialChart = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+          labels: ['潜力', '剩余'],
+          datasets: [{
+            data: [85, 15],
+            backgroundColor: ['#3b82f6', '#e2e8f0'],
+            borderWidth: 0,
+            cutout: '75%'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          animation: { animateRotate: true, animateScale: true }
+        }
+      });
+    }
+    
+    var events = [];
+    
+    function addEvent(data) {
+      var event = {
+        id: data.id || FDE.utils.generateId(),
+        type: data.kind || 'click',
+        appName: data.appName || 'Unknown',
+        summary: data.summary || '未知事件',
+        timestamp: data.atMs || Date.now(),
+        durationMs: data.durationMs || 0
+      };
+      
+      events.unshift(event);
+      if (events.length > 50) events.pop();
+      
+      renderEvents();
+    }
+    
+    function renderEvents() {
+      var container = document.getElementById('events-container');
+      var html = '';
+      
+      events.forEach(function(ev) {
+        var typeClass = getTypeClass(ev.type);
+        var typeText = getTypeText(ev.type);
+        
+        html += `
+          <div class="relative pl-10 py-4 border-b border-gray-100 last:border-0 animate-slide-in event-item" data-event-id="${ev.id}">
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-10 flex justify-center">
+              <div class="w-3 h-3 rounded-full ${typeClass.replace('type-', 'bg-').replace('click', 'blue').replace('keyboard', 'pink').replace('screenshot', 'green').replace('app-switch', 'yellow').replace('file', 'purple')}-500"></div>
+            </div>
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="event-type-tag ${typeClass}">${typeText}</span>
+                <span class="text-xs text-gray-400 font-mono">${FDE.utils.formatTime(ev.timestamp)}</span>
+              </div>
+              <div class="font-medium text-gray-800 text-sm mb-1">${FDE.utils.escapeHtml(ev.appName)}</div>
+              <div class="text-xs text-gray-500 line-clamp-2">${FDE.utils.escapeHtml(ev.summary)}</div>
+            </div>
+          </div>
+        `;
+      });
+      
+      container.innerHTML = html;
+      
+      // Bind click events
+      container.querySelectorAll('.event-item').forEach(function(item) {
+        item.addEventListener('click', function() {
+          showEventDetail(this.getAttribute('data-event-id'));
+        });
+      });
+    }
+    
+    function getTypeClass(type) {
+      var classes = {
+        'click': 'type-click',
+        'keyboard': 'type-keyboard',
+        'screenshot': 'type-screenshot',
+        'app-switch': 'type-app-switch',
+        'file-open': 'type-file'
+      };
+      return classes[type] || 'type-click';
+    }
+    
+    function getTypeText(type) {
+      var texts = {
+        'click': '点击',
+        'keyboard': '键盘',
+        'screenshot': '截图',
+        'app-switch': '切换',
+        'file-open': '文件'
+      };
+      return texts[type] || '事件';
+    }
+    
+    function showEventDetail(eventId) {
+      var event = events.find(function(e) { return e.id === eventId; });
+      if (!event) return;
+      
+      document.getElementById('modal-event-type').textContent = getTypeText(event.type);
+      document.getElementById('modal-event-type').className = 'event-type-tag ' + getTypeClass(event.type);
+      document.getElementById('modal-event-time').textContent = FDE.utils.formatTime(event.timestamp);
+      document.getElementById('modal-app-name').textContent = event.appName;
+      document.getElementById('modal-summary').textContent = event.summary;
+      document.getElementById('modal-duration').textContent = (event.durationMs / 1000).toFixed(1) + ' 秒';
+      document.getElementById('modal-position').textContent = 'x: 0, y: 0, w: 0, h: 0';
+      
+      document.getElementById('event-modal').classList.remove('hidden');
+    }
+    
+    function loadSessionInfo(sessionId, password) {
+      // Load session details from backend
+      FDE.http.get('/api/sessions/' + sessionId + '/events?offset=0&limit=1&password=' + encodeURIComponent(password)).then(function(data) {
+        if (data && data.session) {
+          document.getElementById('session-name').textContent = data.session.name || ('会话 ' + sessionId.slice(-8));
+          updateSessionUI(data.session.status || 'idle');
+        }
+      }).catch(function() {});
+    }
+    
+    function loadRealEvents(sessionId, password) {
+      FDE.session.getEvents(sessionId, password, 0, 50).then(function(data) {
+        var events = data.events || [];
+        events.reverse().forEach(function(evt) {
+          addEvent({
+            id: evt.id || evt.timestamp,
+            kind: evt.kind || 'unknown',
+            appName: evt.appName || '',
+            summary: evt.summary || (evt.kind + ' 事件'),
+            atMs: evt.atMs || evt.timestamp,
+            durationMs: evt.durationMs || 0
+          });
+        });
+      }).catch(function(err) {
+        console.log('Failed to load events:', err);
+      });
+    }
+    
+    function updateSessionUI(status) {
+      var statusText = '待开始';
+      var statusClass = '';
+      
+      if (status === 'recording') { statusText = '观察中'; statusClass = 'status-recording'; }
+      else if (status === 'paused') { statusText = '已暂停'; statusClass = 'status-paused'; }
+      else if (status === 'finalized') { statusText = '已完成'; statusClass = 'status-finalized'; }
+      
+      document.getElementById('session-status').textContent = statusText;
+      var dot = document.querySelector('#session-status').parentElement.querySelector('.status-dot');
+      if (dot) {
+        dot.className = 'status-dot ' + statusClass;
+      }
+      
+      var startBtn = document.getElementById('btn-start');
+      var pauseBtn = document.getElementById('btn-pause');
+      var endBtn = document.getElementById('btn-end');
+      
+      if (status === 'recording') {
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'inline-flex';
+        endBtn.style.display = 'inline-flex';
+      } else if (status === 'paused') {
+        startBtn.style.display = 'inline-flex';
+        startBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4 inline mr-1"></i>继续观察';
+        pauseBtn.style.display = 'none';
+        endBtn.style.display = 'inline-flex';
+      } else if (status === 'finalized') {
+        startBtn.style.display = 'none';
+        pauseBtn.style.display = 'none';
+        endBtn.style.display = 'none';
+      } else {
+        startBtn.style.display = 'inline-flex';
+        startBtn.innerHTML = '<i data-lucide="play" class="w-4 h-4 inline mr-1"></i>开始观察';
+        pauseBtn.style.display = 'none';
+        endBtn.style.display = 'none';
+      }
+      
+      lucide.createIcons();
+    }
+    
+    function updateSessionStatus(data) {
+      if (data.status) {
+        updateSessionUI(data.status);
+      }
+      if (data.eventCount) {
+        document.getElementById('event-count').textContent = data.eventCount.toLocaleString();
+      }
+    }
+  </script>
+</body>
+</html>

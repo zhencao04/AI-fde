@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI FDE 助手 — 观察仪表盘</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+      /* ═══════════════════════════════════════════════════════════════
+         Design Tokens — Minimal Dashboard with #2563ef blue accent
+         ═══════════════════════════════════════════════════════════════ */
+      :root {
+        /* Colors */
+        --blue: #2563ef;
+        --blue-50: rgba(37,99,239,0.05);
+        --blue-100: rgba(37,99,239,0.10);
+        --blue-200: rgba(37,99,239,0.15);
+        --blue-300: rgba(37,99,239,0.20);
+        --blue-400: rgba(37,99,239,0.30);
+        --blue-500: rgba(37,99,239,0.50);
+
+        --bg: #ffffff;
+        --bg-muted: #f5f5f5;
+        --text: #18181b;
+        --text-muted: #858585;
+        --border: #e5e5e5;
+        --border-strong: #d4d4d4;
+
+        /* Typography */
+        --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-serif: 'DM Serif Display', Georgia, serif;
+        --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+
+        /* Spacing & Radius */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-7: 28px;
+        --space-8: 32px;
+        --radius: 25.2px;
+        --radius-sm: 8px;
+        --radius-xs: 4px;
+
+        /* Tracking */
+        --tracking-tight: -0.02em;
+        --tracking-normal: 0;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Reset & Base
+         ═══════════════════════════════════════════════════════════════ */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { min-height: 100%; }
+      body {
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        letter-spacing: var(--tracking-normal);
+        line-height: 1.5;
+      }
+      button { font: inherit; border: none; background: none; cursor: pointer; color: inherit; }
+      button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--blue); }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Icon Helper
+         ═══════════════════════════════════════════════════════════════ */
+      .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .icon svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .icon-sm svg { width: 14px; height: 14px; }
+      .icon-lg svg { width: 20px; height: 20px; }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Shell
+         ═══════════════════════════════════════════════════════════════ */
+      .shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         TOP NAV
+         ═══════════════════════════════════════════════════════════════ */
+      .top-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        padding: var(--space-4) var(--space-6);
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-5);
+      }
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-sm);
+        background: var(--blue);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-family: var(--font-serif);
+        font-size: 0.85rem;
+        letter-spacing: -0.02em;
+      }
+      .brand-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+      .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        transition: color 180ms ease, background 180ms ease;
+      }
+      .btn-back:hover {
+        color: var(--text);
+        background: var(--bg-muted);
+      }
+      .nav-center {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        border-radius: 999px;
+        background: var(--blue);
+        color: #fff;
+        font-size: 0.75rem;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+      }
+      .pulsing-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.4; transform: scale(0.7); }
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        height: 32px;
+        padding: 0 var(--space-4);
+        border-radius: var(--radius-sm);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        line-height: 1;
+        white-space: nowrap;
+        transition: background 180ms ease, border-color 180ms ease, color 180ms ease, transform 120ms ease;
+      }
+      .btn:active { transform: scale(0.98); }
+      .btn-outlined {
+        border: 1px solid var(--border);
+        color: var(--text);
+        background: transparent;
+      }
+      .btn-outlined:hover {
+        background: var(--bg-muted);
+      }
+      .btn-primary {
+        background: var(--blue);
+        color: #fff;
+        border: 1px solid var(--blue);
+      }
+      .btn-primary:hover {
+        background: #1d4ed8;
+        border-color: #1d4ed8;
+      }
+      .btn-ghost {
+        width: 32px;
+        padding: 0;
+        color: var(--text-muted);
+        border-radius: var(--radius-sm);
+      }
+      .btn-ghost:hover {
+        background: var(--bg-muted);
+        color: var(--text);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         THREE-COLUMN LAYOUT
+         ═══════════════════════════════════════════════════════════════ */
+      .dashboard-body {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr) 280px;
+        flex: 1;
+        min-height: 0;
+      }
+
+      /* ─── LEFT SIDEBAR ─────────────────────────────────────────── */
+      .sidebar-left {
+        background: var(--bg-muted);
+        border-right: 1px solid var(--border);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+      .sidebar-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar-card-title {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: var(--space-4);
+      }
+      .sidebar-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) 0;
+      }
+      .sidebar-row + .sidebar-row {
+        border-top: 1px solid var(--border);
+      }
+      .sidebar-row-label {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+      }
+      .sidebar-row-value {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text);
+        font-family: var(--font-mono);
+        letter-spacing: var(--tracking-tight);
+      }
+      .scope-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) 0;
+      }
+      .scope-item + .scope-item {
+        border-top: 1px solid var(--border);
+      }
+      .scope-label {
+        font-size: 0.8125rem;
+        color: var(--text);
+      }
+      .scope-count {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        background: var(--bg-muted);
+        padding: 2px var(--space-2);
+        border-radius: 999px;
+      }
+
+      /* ─── CENTER ───────────────────────────────────────────────── */
+      .center-content {
+        padding: var(--space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-6);
+        overflow-y: auto;
+      }
+      .section-heading {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+        color: var(--text);
+      }
+
+      /* Heatmap */
+      .heatmap-container {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+      }
+      .heatmap-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-5);
+      }
+      .heatmap-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+      .heatmap-subtitle {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+      .heatmap-grid {
+        display: grid;
+        grid-template-columns: 48px repeat(7, 1fr);
+        grid-template-rows: auto repeat(8, 1fr);
+        gap: var(--space-1);
+        min-height: 280px;
+      }
+      .heatmap-corner {
+        grid-column: 1;
+        grid-row: 1;
+      }
+      .heatmap-day-label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.72rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        grid-row: 1;
+      }
+      .heatmap-time-label {
+        display: flex;
+        align-items: center;
+        font-size: 0.68rem;
+        font-family: var(--font-mono);
+        color: var(--text-muted);
+        grid-column: 1;
+      }
+      .heatmap-cell {
+        border-radius: var(--radius-xs);
+        transition: transform 120ms ease;
+        min-height: 28px;
+      }
+      .heatmap-cell:hover {
+        transform: scale(1.1);
+      }
+
+      /* Legend */
+      .heatmap-legend {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-top: var(--space-5);
+        padding-top: var(--space-4);
+        border-top: 1px solid var(--border);
+      }
+      .legend-label {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .legend-bar {
+        display: flex;
+        flex: 1;
+        height: 8px;
+        border-radius: 999px;
+        overflow: hidden;
+      }
+      .legend-bar span {
+        flex: 1;
+      }
+
+      /* Divider */
+      .divider {
+        height: 1px;
+        background: var(--border);
+      }
+
+      /* Daily Summary */
+      .summary-heading {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+        margin-bottom: var(--space-4);
+      }
+      .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-4);
+      }
+      .summary-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+        transition: border-color 200ms ease;
+      }
+      .summary-card:hover {
+        border-color: var(--border-strong);
+      }
+      .summary-card-day {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+      }
+      .summary-card-day.today {
+        color: var(--blue);
+      }
+      .summary-stat-row {
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-2);
+      }
+      .summary-stat-value {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        font-family: var(--font-mono);
+        letter-spacing: var(--tracking-tight);
+      }
+      .summary-stat-label {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+      .summary-peak {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+      .summary-peak .icon { color: var(--text-muted); }
+
+      /* ─── RIGHT SIDEBAR ───────────────────────────────────────── */
+      .sidebar-right {
+        border-left: 1px solid var(--border);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-5);
+        overflow-y: auto;
+      }
+
+      /* Stats Panel */
+      .stats-panel {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-5);
+      }
+      .stat-block {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+      .stat-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+      }
+      .stat-number {
+        font-family: var(--font-serif);
+        font-size: 2.5rem;
+        line-height: 1;
+        letter-spacing: var(--tracking-tight);
+        color: var(--text);
+      }
+      .stat-number.accent {
+        color: var(--blue);
+      }
+      .stat-sub {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+      }
+
+      /* Stat rows (smaller stats) */
+      .stat-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        padding: var(--space-3) 0;
+        border-top: 1px solid var(--border);
+      }
+      .stat-row-left {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+      }
+      .stat-row-label {
+        font-size: 0.8125rem;
+        color: var(--text);
+      }
+      .stat-row-sub {
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+      .stat-row-value {
+        font-family: var(--font-serif);
+        font-size: 1.5rem;
+        line-height: 1;
+        letter-spacing: var(--tracking-tight);
+        color: var(--text);
+      }
+
+      /* Mini Chart */
+      .mini-chart-card {
+        background: var(--bg-muted);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-4);
+      }
+      .mini-chart-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+      .mini-chart-bars {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--space-2);
+        height: 80px;
+      }
+      .mini-bar-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: flex-end;
+        height: 100%;
+      }
+      .mini-bar {
+        width: 100%;
+        border-radius: 3px 3px 0 0;
+        background: var(--blue);
+        transition: opacity 200ms ease;
+      }
+      .mini-bar-col:hover .mini-bar { opacity: 0.8; }
+      .mini-bar-label {
+        font-size: 0.65rem;
+        font-family: var(--font-mono);
+        color: var(--text-muted);
+        text-align: center;
+        margin-top: var(--space-1);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         BOTTOM BAR
+         ═══════════════════════════════════════════════════════════════ */
+      .bottom-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) var(--space-6);
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+      }
+      .bottom-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.72rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+      }
+      .bottom-left .icon {
+        width: 12px;
+        height: 12px;
+        color: var(--text-muted);
+      }
+      .bottom-left .icon svg {
+        width: 12px;
+        height: 12px;
+      }
+      .bottom-right a {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--blue);
+        text-decoration: none;
+        transition: opacity 180ms ease;
+      }
+      .bottom-right a:hover {
+        opacity: 0.8;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Responsive
+         ═══════════════════════════════════════════════════════════════ */
+      @media (max-width: 1100px) {
+        .dashboard-body {
+          grid-template-columns: 1fr;
+        }
+        .sidebar-left, .sidebar-right {
+          border: none;
+          border-bottom: 1px solid var(--border);
+        }
+        .sidebar-left {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        .sidebar-card { flex: 1; min-width: 200px; }
+        .sidebar-right {
+          flex-direction: row;
+          flex-wrap: wrap;
+        }
+        .stats-panel, .mini-chart-card { flex: 1; min-width: 200px; }
+      }
+      @media (max-width: 640px) {
+        .top-nav {
+          flex-wrap: wrap;
+          gap: var(--space-2);
+        }
+        .nav-center { order: 3; width: 100%; justify-content: center; }
+        .nav-right { margin-left: auto; }
+        .summary-grid { grid-template-columns: 1fr; }
+        .heatmap-grid { min-height: 200px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+
+      <!-- ═══ TOP NAV ═══ -->
+      <nav class="top-nav">
+        <div class="nav-left">
+          <div class="brand-logo">
+            <div class="brand-mark">F</div>
+            <span class="brand-name">AI FDE 助手</span>
+          </div>
+          <button class="btn-back" data-dom-id="back-home" onclick="history.back()">
+            <span class="icon" data-icon="arrow-left">
+              <svg viewBox="0 0 24 24"><path d="M12 19l-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </span>
+            返回
+          </button>
+        </div>
+        <div class="nav-center">
+          <span class="status-badge">
+            <span class="pulsing-dot"></span>
+            观察中 · 第 2 天 / 3 天
+          </span>
+        </div>
+        <div class="nav-right">
+          <button class="btn-ghost" data-dom-id="open-notifications" aria-label="通知">
+            <span class="icon" data-icon="mail">
+              <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            </span>
+          </button>
+          <button class="btn btn-outlined" data-dom-id="pause-observation">
+            <span class="icon icon-sm" data-icon="circle-pause">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 15V9"/><path d="M14 15V9"/></svg>
+            </span>
+            暂停观察
+          </button>
+          <button class="btn btn-primary" data-dom-id="end-observation">
+            <span class="icon icon-sm" data-icon="check">
+              <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+            </span>
+            结束观察 · 生成报告
+          </button>
+        </div>
+      </nav>
+
+      <!-- ═══ DASHBOARD BODY — THREE COLUMNS ═══ -->
+      <div class="dashboard-body">
+
+        <!-- ─── LEFT SIDEBAR ─── -->
+        <aside class="sidebar-left">
+          <!-- 观察状态 -->
+          <div class="sidebar-card">
+            <div class="sidebar-card-title">观察状态</div>
+            <div class="sidebar-row">
+              <span class="sidebar-row-label">运行时间</span>
+              <span class="sidebar-row-value">16h32m</span>
+            </div>
+            <div class="sidebar-row">
+              <span class="sidebar-row-label">事件</span>
+              <span class="sidebar-row-value">1,247</span>
+            </div>
+            <div class="sidebar-row">
+              <span class="sidebar-row-label">活跃应用</span>
+              <span class="sidebar-row-value">Excel</span>
+            </div>
+            <div class="sidebar-row">
+              <span class="sidebar-row-label">敏感区域</span>
+              <span class="sidebar-row-value" style="color: var(--text-muted);">无</span>
+            </div>
+          </div>
+
+          <!-- 观察范围 -->
+          <div class="sidebar-card">
+            <div class="sidebar-card-title">观察范围</div>
+            <div class="scope-item">
+              <span class="scope-label">白名单</span>
+              <span class="scope-count">4 个</span>
+            </div>
+            <div class="scope-item">
+              <span class="scope-label">黑名单</span>
+              <span class="scope-count">3 个</span>
+            </div>
+            <div class="scope-item">
+              <span class="scope-label">敏感区域</span>
+              <span class="scope-count">0 个</span>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ─── CENTER CONTENT ─── -->
+        <main class="center-content">
+
+          <!-- Heatmap Section -->
+          <div class="heatmap-container">
+            <div class="heatmap-header">
+              <div>
+                <div class="heatmap-title">工作活动热力图</div>
+                <div class="heatmap-subtitle">第 2 天 · 实时更新</div>
+              </div>
+            </div>
+
+            <!-- 7x8 CSS Grid: Mon-Sun x 9:00-17:00 -->
+            <div class="heatmap-grid">
+              <!-- Corner -->
+              <div class="heatmap-corner"></div>
+              <!-- Day labels -->
+              <div class="heatmap-day-label" style="grid-column:2;">周一</div>
+              <div class="heatmap-day-label" style="grid-column:3;">周二</div>
+              <div class="heatmap-day-label" style="grid-column:4;">周三</div>
+              <div class="heatmap-day-label" style="grid-column:5;">周四</div>
+              <div class="heatmap-day-label" style="grid-column:6;">周五</div>
+              <div class="heatmap-day-label" style="grid-column:7;">周六</div>
+              <div class="heatmap-day-label" style="grid-column:8;">周日</div>
+
+              <!-- 9:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:2;">09:00</div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:2;background:rgba(37,99,239,0.35);"></div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:3;background:rgba(37,99,239,0.45);"></div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:4;background:rgba(37,99,239,0.40);"></div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:5;background:rgba(37,99,239,0.15);"></div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:6;background:rgba(37,99,239,0.25);"></div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:2;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 10:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:3;">10:00</div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:2;background:rgba(37,99,239,0.50);"></div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:3;background:rgba(37,99,239,0.50);"></div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:4;background:rgba(37,99,239,0.45);"></div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:5;background:rgba(37,99,239,0.20);"></div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:6;background:rgba(37,99,239,0.35);"></div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:3;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 11:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:4;">11:00</div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:2;background:rgba(37,99,239,0.45);"></div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:3;background:rgba(37,99,239,0.40);"></div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:4;background:rgba(37,99,239,0.35);"></div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:5;background:rgba(37,99,239,0.10);"></div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:6;background:rgba(37,99,239,0.30);"></div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:4;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 12:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:5;">12:00</div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:2;background:rgba(37,99,239,0.20);"></div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:3;background:rgba(37,99,239,0.25);"></div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:4;background:rgba(37,99,239,0.20);"></div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:5;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:6;background:rgba(37,99,239,0.15);"></div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:5;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 13:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:6;">13:00</div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:2;background:rgba(37,99,239,0.30);"></div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:3;background:rgba(37,99,239,0.35);"></div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:4;background:rgba(37,99,239,0.30);"></div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:5;background:rgba(37,99,239,0.10);"></div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:6;background:rgba(37,99,239,0.20);"></div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:6;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 14:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:7;">14:00</div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:2;background:rgba(37,99,239,0.40);"></div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:3;background:rgba(37,99,239,0.45);"></div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:4;background:rgba(37,99,239,0.35);"></div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:5;background:rgba(37,99,239,0.15);"></div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:6;background:rgba(37,99,239,0.30);"></div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:7;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 15:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:8;">15:00</div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:2;background:rgba(37,99,239,0.35);"></div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:3;background:rgba(37,99,239,0.40);"></div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:4;background:rgba(37,99,239,0.30);"></div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:5;background:rgba(37,99,239,0.10);"></div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:6;background:rgba(37,99,239,0.25);"></div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:8;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+
+              <!-- 16:00 Row -->
+              <div class="heatmap-time-label" style="grid-row:9;">16:00</div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:2;background:rgba(37,99,239,0.25);"></div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:3;background:rgba(37,99,239,0.30);"></div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:4;background:rgba(37,99,239,0.25);"></div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:5;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:6;background:rgba(37,99,239,0.20);"></div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:7;background:rgba(37,99,239,0.05);"></div>
+              <div class="heatmap-cell" style="grid-row:9;grid-column:8;background:rgba(37,99,239,0.05);"></div>
+            </div>
+
+            <!-- Legend -->
+            <div class="heatmap-legend">
+              <span class="legend-label">低频</span>
+              <div class="legend-bar">
+                <span style="background:rgba(37,99,239,0.05);"></span>
+                <span style="background:rgba(37,99,239,0.12);"></span>
+                <span style="background:rgba(37,99,239,0.20);"></span>
+                <span style="background:rgba(37,99,239,0.30);"></span>
+                <span style="background:rgba(37,99,239,0.40);"></span>
+                <span style="background:rgba(37,99,239,0.50);"></span>
+              </div>
+              <span class="legend-label">高频</span>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="divider"></div>
+
+          <!-- 每日摘要 -->
+          <div>
+            <div class="summary-heading">每日摘要</div>
+            <div class="summary-grid">
+              <!-- Day 2 (today) -->
+              <div class="summary-card">
+                <div class="summary-card-day today">第 2 天（今天）</div>
+                <div class="summary-stat-row">
+                  <span class="summary-stat-value">23</span>
+                  <span class="summary-stat-label">跨应用操作</span>
+                </div>
+                <div class="summary-stat-row">
+                  <span class="summary-stat-value">8</span>
+                  <span class="summary-stat-label">重复模式组</span>
+                </div>
+                <div class="summary-peak">
+                  <span class="icon" data-icon="arrow-up">
+                    <svg viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+                  </span>
+                  活跃高峰 9:00–11:30
+                </div>
+              </div>
+              <!-- Day 1 (yesterday) -->
+              <div class="summary-card">
+                <div class="summary-card-day">第 1 天（昨天）</div>
+                <div class="summary-stat-row">
+                  <span class="summary-stat-value">31</span>
+                  <span class="summary-stat-label">跨应用操作</span>
+                </div>
+                <div class="summary-stat-row">
+                  <span class="summary-stat-value">12</span>
+                  <span class="summary-stat-label">重复模式组</span>
+                </div>
+                <div class="summary-peak">
+                  <span class="icon" data-icon="arrow-up">
+                    <svg viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></svg>
+                  </span>
+                  活跃高峰 14:00–17:00
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </main>
+
+        <!-- ─── RIGHT SIDEBAR ─── -->
+        <aside class="sidebar-right">
+          <!-- Stats Panel -->
+          <div class="stats-panel">
+            <div class="stat-block">
+              <span class="stat-label">总事件数</span>
+              <span class="stat-number accent">1,247</span>
+              <span class="stat-sub">累计观察 16h32m</span>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-row-left">
+                <span class="stat-row-label">今日跨应用</span>
+                <span class="stat-row-sub">跨应用操作</span>
+              </div>
+              <span class="stat-row-value">23</span>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-row-left">
+                <span class="stat-row-label">重复模式</span>
+                <span class="stat-row-sub">识别模式组</span>
+              </div>
+              <span class="stat-row-value">8</span>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-row-left">
+                <span class="stat-row-label">监控应用</span>
+                <span class="stat-row-sub">活跃进程</span>
+              </div>
+              <span class="stat-row-value">12</span>
+            </div>
+          </div>
+
+          <!-- 趋势 Mini Chart -->
+          <div class="mini-chart-card">
+            <div class="mini-chart-title">趋势</div>
+            <div class="mini-chart-bars">
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:35%;opacity:0.4;"></div>
+                <div class="mini-bar-label">9</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:65%;opacity:0.6;"></div>
+                <div class="mini-bar-label">10</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:80%;opacity:0.8;"></div>
+                <div class="mini-bar-label">11</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:40%;opacity:0.4;"></div>
+                <div class="mini-bar-label">12</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:55%;opacity:0.5;"></div>
+                <div class="mini-bar-label">13</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:70%;opacity:0.7;"></div>
+                <div class="mini-bar-label">14</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:50%;opacity:0.5;"></div>
+                <div class="mini-bar-label">15</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:30%;opacity:0.3;"></div>
+                <div class="mini-bar-label">16</div>
+              </div>
+              <div class="mini-bar-col">
+                <div class="mini-bar" style="height:20%;opacity:0.25;"></div>
+                <div class="mini-bar-label">17</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- ═══ BOTTOM BAR ═══ -->
+      <footer class="bottom-bar">
+        <div class="bottom-left">
+          <span class="icon" data-icon="check">
+            <svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+          </span>
+          AES-256-GCM 本地加密
+        </div>
+        <div class="bottom-right">
+          <a href="#" data-dom-id="open-raw-events">查看原始事件</a>
+        </div>
+      </footer>
+
+    </div>
+  </body>
+</html>

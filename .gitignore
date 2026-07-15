@@ -1,0 +1,88 @@
+# Dependencies
+node_modules/
+paddle_ocr_service/venv/
+
+# Build output
+dist/
+build/
+
+# Environment files - NEVER commit these
+.env
+.env.local
+.env.*.local
+
+# Data files (contain session recordings, encrypted events)
+.data/
+
+# Uploaded files
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.cache/
+*.tsbuildinfo
+
+# Credentials and secrets
+*credential*
+*secret*
+*.pem
+*.key
+
+# Docker
+docker-compose.override.yml
+.docker-compose.cache/
+*.dockerfile
+
+# Temp scripts & test files (root level)
+check-js*.js
+check-template.js
+find-js-error.js
+fix-issues.js
+frontend_test*.js
+test-deepseek*.js
+test-deepseek-direct*.js
+test-role-api.js
+get_url.js
+download-repo.js
+_temp_*.js
+temp_frontend.js
+update_frontend.js
+err.txt
+out.txt
+.data_test_frontend.js
+
+# Intranet penetration tools
+natapp.exe
+run_natapp.bat
+
+# Agent artifacts
+.agents/
+.trae/
+agent/
+ai-workflow-observer-agent/
+screencapture-client/
+skills-lock.json
+
+# Taste skill temp
+_tmp_taste_skill/
+
+# Coverage
+coverage/
+
+# Deploy scripts (keep deploy/ folder, but exclude temp)
+deploy/temp_pack/
+deploy/*.zip

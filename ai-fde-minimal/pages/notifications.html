@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI FDE 助手 — 消息提醒</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Geist+Mono:wght@400;500&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+      /* ═══════════════════════════════════════════════════════════════
+         Design Tokens — Minimal Dashboard with #2563ef blue accent
+         ═══════════════════════════════════════════════════════════════ */
+      :root {
+        /* Colors */
+        --blue: #2563ef;
+        --blue-50: rgba(37,99,239,0.05);
+        --blue-100: rgba(37,99,239,0.10);
+        --blue-200: rgba(37,99,239,0.15);
+        --blue-300: rgba(37,99,239,0.20);
+        --blue-400: rgba(37,99,239,0.30);
+        --blue-500: rgba(37,99,239,0.50);
+
+        --red: #cf001c;
+        --red-50: rgba(207,0,28,0.05);
+        --red-100: rgba(207,0,28,0.10);
+
+        --bg: #ffffff;
+        --bg-muted: #f5f5f5;
+        --text: #18181b;
+        --text-muted: #858585;
+        --border: #e5e5e5;
+        --border-strong: #d4d4d4;
+
+        /* Typography */
+        --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-serif: 'DM Serif Display', Georgia, serif;
+        --font-mono: 'Geist Mono', 'SF Mono', 'Fira Code', monospace;
+
+        /* Spacing & Radius */
+        --space-1: 4px;
+        --space-2: 8px;
+        --space-3: 12px;
+        --space-4: 16px;
+        --space-5: 20px;
+        --space-6: 24px;
+        --space-7: 28px;
+        --space-8: 32px;
+        --radius: 25.2px;
+        --radius-sm: 8px;
+        --radius-xs: 4px;
+
+        /* Tracking */
+        --tracking-tight: -0.02em;
+        --tracking-normal: 0;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Reset & Base
+         ═══════════════════════════════════════════════════════════════ */
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { min-height: 100%; }
+      body {
+        font-family: var(--font-sans);
+        background: var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        letter-spacing: var(--tracking-normal);
+        line-height: 1.5;
+      }
+      button { font: inherit; border: none; background: none; cursor: pointer; color: inherit; }
+      button:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--blue); }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Icon Helper
+         ═══════════════════════════════════════════════════════════════ */
+      .icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        flex-shrink: 0;
+      }
+      .icon svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .icon-sm svg { width: 14px; height: 14px; }
+      .icon-lg svg { width: 20px; height: 20px; }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Shell
+         ═══════════════════════════════════════════════════════════════ */
+      .shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         TOP NAV
+         ═══════════════════════════════════════════════════════════════ */
+      .top-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        padding: var(--space-4) var(--space-6);
+        border-bottom: 1px solid var(--border);
+        background: var(--bg);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .nav-left {
+        display: flex;
+        align-items: center;
+        gap: var(--space-5);
+      }
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        text-decoration: none;
+        color: var(--text);
+      }
+      .brand-mark {
+        width: 28px;
+        height: 28px;
+        border-radius: var(--radius-sm);
+        background: var(--blue);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-family: var(--font-serif);
+        font-size: 0.85rem;
+        letter-spacing: -0.02em;
+      }
+      .brand-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+      }
+      .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        padding: var(--space-2) var(--space-3);
+        border-radius: var(--radius-sm);
+        text-decoration: none;
+        transition: color 180ms ease, background 180ms ease;
+      }
+      .btn-back:hover {
+        color: var(--text);
+        background: var(--bg-muted);
+      }
+      .nav-center {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+      }
+      .page-title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        letter-spacing: var(--tracking-tight);
+        white-space: nowrap;
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Buttons
+         ═══════════════════════════════════════════════════════════════ */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        line-height: 1;
+        padding: var(--space-2) var(--space-4);
+        border-radius: var(--radius);
+        transition: all 180ms ease;
+        white-space: nowrap;
+      }
+      .btn-primary {
+        background: var(--blue);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: #1d4ed8;
+      }
+      .btn-outlined {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-outlined:hover {
+        border-color: var(--border-strong);
+        background: var(--bg-muted);
+      }
+      .btn-text {
+        background: transparent;
+        color: var(--blue);
+        padding: var(--space-2) var(--space-2);
+      }
+      .btn-text:hover {
+        background: var(--blue-50);
+        border-radius: var(--radius-sm);
+      }
+
+      /* Bell button */
+      .btn-bell {
+        position: relative;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-sm);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        transition: color 180ms ease, background 180ms ease;
+      }
+      .btn-bell:hover {
+        color: var(--text);
+        background: var(--bg-muted);
+      }
+
+      /* Badge */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        padding: 0 6px;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        font-family: var(--font-mono);
+        line-height: 1;
+      }
+      .badge-blue {
+        background: var(--blue);
+        color: #fff;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Filter Tabs
+         ═══════════════════════════════════════════════════════════════ */
+      .filter-tabs {
+        display: flex;
+        align-items: center;
+        gap: var(--space-1);
+        padding: var(--space-4) var(--space-6) 0;
+        border-bottom: none;
+        overflow-x: auto;
+      }
+      .filter-tab {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        padding: var(--space-2) var(--space-3) var(--space-3);
+        border-bottom: 2px solid transparent;
+        transition: color 180ms ease, border-color 180ms ease;
+        white-space: nowrap;
+        background: none;
+        border-top: none;
+        border-left: none;
+        border-right: none;
+      }
+      .filter-tab:hover {
+        color: var(--text);
+      }
+      .filter-tab.active {
+        color: var(--blue);
+        border-bottom-color: var(--blue);
+      }
+      .filter-tab-count {
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 400;
+        color: var(--text-muted);
+      }
+      .filter-tab.active .filter-tab-count {
+        color: var(--blue);
+      }
+      .filter-tabs-border {
+        border-bottom: 1px solid var(--border);
+        margin: 0 var(--space-6);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Content Area
+         ═══════════════════════════════════════════════════════════════ */
+      .content {
+        flex: 1;
+        padding: 0 var(--space-6) var(--space-8);
+        max-width: 800px;
+        width: 100%;
+        margin: 0 auto;
+      }
+
+      /* Group label */
+      .group-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: var(--space-5) 0 var(--space-3);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Notification Item
+         ═══════════════════════════════════════════════════════════════ */
+      .notification-item {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-4);
+        padding: var(--space-4);
+        border-radius: var(--radius-sm);
+        border-left: 3px solid transparent;
+        transition: background 180ms ease;
+        position: relative;
+      }
+      .notification-item:hover {
+        background: var(--bg-muted);
+      }
+      .notification-item.unread {
+        background: var(--bg-muted);
+        border-left-color: var(--blue);
+      }
+      .notification-item.unread:hover {
+        background: #efefef;
+      }
+      .notification-item.alert {
+        border-left-color: var(--red);
+      }
+      .notification-item.read-all {
+        background: var(--bg);
+        border-left-color: transparent;
+      }
+
+      /* Unread dot */
+      .unread-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--blue);
+        flex-shrink: 0;
+        margin-top: 5px;
+      }
+      .notification-item.read-all .unread-dot {
+        visibility: hidden;
+      }
+
+      .notification-body {
+        flex: 1;
+        min-width: 0;
+      }
+      .notification-header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: var(--space-3);
+        margin-bottom: var(--space-1);
+      }
+      .notification-source {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: var(--tracking-tight);
+      }
+      .notification-item.read-all .notification-source {
+        font-weight: 500;
+      }
+      .notification-time {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-family: var(--font-mono);
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .notification-desc {
+        font-size: 0.8125rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        margin-bottom: var(--space-2);
+      }
+      .notification-action {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-1);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--blue);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-xs);
+        background: none;
+        border: none;
+        cursor: pointer;
+        transition: background 180ms ease;
+      }
+      .notification-action:hover {
+        background: var(--blue-50);
+      }
+      .notification-action svg {
+        width: 14px;
+        height: 14px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Load More
+         ═══════════════════════════════════════════════════════════════ */
+      .load-more-wrap {
+        display: flex;
+        justify-content: center;
+        padding: var(--space-6) 0;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════
+         Responsive
+         ═══════════════════════════════════════════════════════════════ */
+      @media (max-width: 640px) {
+        .top-nav { padding: var(--space-3) var(--space-4); }
+        .nav-center { display: none; }
+        .content { padding: 0 var(--space-4) var(--space-6); }
+        .filter-tabs { padding: var(--space-3) var(--space-4) 0; }
+        .filter-tabs-border { margin: 0 var(--space-4); }
+        .notification-item { padding: var(--space-3); }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+
+      <!-- ═══════════ TOP NAV ═══════════ -->
+      <nav class="top-nav">
+        <div class="nav-left">
+          <a href="login.html" class="brand-logo">
+            <div class="brand-mark">A</div>
+            <span class="brand-name">AI FDE 助手</span>
+          </a>
+          <a href="observation-dashboard.html" class="btn-back" data-dom-id="back-home">
+            <span class="icon icon-sm">
+              <svg viewBox="0 0 24 24"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            </span>
+            返回
+          </a>
+        </div>
+        <div class="nav-center">
+          <span class="page-title">消息提醒</span>
+        </div>
+        <div class="nav-right">
+          <button class="btn btn-outlined" data-dom-id="mark-all-read">全部已读</button>
+          <span class="badge badge-blue" id="unread-count">12</span>
+          <button class="btn-bell" data-dom-id="open-notifications" aria-label="消息提醒">
+            <span class="icon icon-lg">
+              <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            </span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- ═══════════ FILTER TABS ═══════════ -->
+      <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-filter="all">
+          全部 <span class="filter-tab-count">12</span>
+        </button>
+        <button class="filter-tab" data-filter="observation">
+          观察状态 <span class="filter-tab-count">4</span>
+        </button>
+        <button class="filter-tab" data-filter="report">
+          报告完成 <span class="filter-tab-count">2</span>
+        </button>
+        <button class="filter-tab" data-filter="system">
+          系统通知 <span class="filter-tab-count">3</span>
+        </button>
+        <button class="filter-tab" data-filter="alert">
+          异常警告 <span class="filter-tab-count">3</span>
+        </button>
+      </div>
+      <div class="filter-tabs-border"></div>
+
+      <!-- ═══════════ NOTIFICATION LIST ═══════════ -->
+      <div class="content" id="notification-list">
+
+        <!-- 今天 -->
+        <div class="group-label" data-group="today">今天</div>
+
+        <!-- 1. Unread - 客户信息搬运助手 -->
+        <div class="notification-item unread" data-category="observation" data-read="false">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">客户信息搬运助手 — 观察进度更新</span>
+              <span class="notification-time">10 分钟前</span>
+            </div>
+            <div class="notification-desc">第 2 天完成，1,247 条事件，8 组重复模式</div>
+            <button class="notification-action">
+              查看详情
+              <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 2. Unread - 自动日报助手 -->
+        <div class="notification-item unread" data-category="observation" data-read="false">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">自动日报助手 — 观察已暂停</span>
+              <span class="notification-time">2 小时前</span>
+            </div>
+            <div class="notification-desc">手动暂停，进度 30%</div>
+            <button class="btn btn-outlined" style="font-size:0.8125rem;padding:var(--space-1) var(--space-3);">
+              恢复观察
+            </button>
+          </div>
+        </div>
+
+        <!-- 昨天 -->
+        <div class="group-label" data-group="yesterday">昨天</div>
+
+        <!-- 3. Read - 库存状态问答 Agent -->
+        <div class="notification-item read-all" data-category="report" data-read="true">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">库存状态问答 Agent — 报告已生成</span>
+              <span class="notification-time">昨天 18:30</span>
+            </div>
+            <div class="notification-desc">3 个可自动化环节，每周节省 4.5h</div>
+            <button class="notification-action">
+              查看报告
+              <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Read - 系统更新 -->
+        <div class="notification-item read-all" data-category="system" data-read="true">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">系统更新</span>
+              <span class="notification-time">昨天 09:15</span>
+            </div>
+            <div class="notification-desc">v2.1.0，新增职业识别</div>
+          </div>
+        </div>
+
+        <!-- 5. Read - 客户信息搬运助手 高频操作 -->
+        <div class="notification-item read-all" data-category="observation" data-read="true">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">客户信息搬运助手 — 新高频操作</span>
+              <span class="notification-time">昨天 14:22</span>
+            </div>
+            <div class="notification-desc">每周 15 次 CRM→表格复制</div>
+          </div>
+        </div>
+
+        <!-- 更早 -->
+        <div class="group-label" data-group="earlier">更早</div>
+
+        <!-- 6. Read Alert - 报价单生成 超时 -->
+        <div class="notification-item read-all alert" data-category="alert" data-read="true">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">报价单生成 — 观察超时</span>
+              <span class="notification-time">3 天前</span>
+            </div>
+            <div class="notification-desc">超过 7 天未启动</div>
+          </div>
+        </div>
+
+        <!-- 7. Read Alert - 数据存储提醒 -->
+        <div class="notification-item read-all alert" data-category="alert" data-read="true">
+          <div class="unread-dot"></div>
+          <div class="notification-body">
+            <div class="notification-header">
+              <span class="notification-source">数据存储提醒</span>
+              <span class="notification-time">5 天前</span>
+            </div>
+            <div class="notification-desc">3 天后自动销毁</div>
+          </div>
+        </div>
+
+        <!-- ═══════════ Load More ═══════════ -->
+        <div class="load-more-wrap">
+          <button class="btn btn-outlined" data-dom-id="load-more">加载更多</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══════════ JavaScript ═══════════ -->
+    <script>
+      (() => {
+        const filterTabs = document.querySelectorAll('#filter-tabs .filter-tab');
+        const items = document.querySelectorAll('.notification-item');
+        const groupLabels = document.querySelectorAll('.group-label');
+        const markAllBtn = document.querySelector('[data-dom-id="mark-all-read"]');
+        const unreadBadge = document.getElementById('unread-count');
+
+        // Tab filtering
+        filterTabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            filterTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const filter = tab.dataset.filter;
+
+            items.forEach(item => {
+              if (filter === 'all' || item.dataset.category === filter) {
+                item.style.display = '';
+              } else {
+                item.style.display = 'none';
+              }
+            });
+
+            // Show/hide group labels based on visible siblings
+            groupLabels.forEach(label => {
+              let nextEl = label.nextElementSibling;
+              let hasVisible = false;
+              while (nextEl && !nextEl.classList.contains('group-label')) {
+                if (nextEl.classList.contains('notification-item') && nextEl.style.display !== 'none') {
+                  hasVisible = true;
+                  break;
+                }
+                nextEl = nextEl.nextElementSibling;
+              }
+              label.style.display = hasVisible ? '' : 'none';
+            });
+          });
+        });
+
+        // Mark all as read
+        markAllBtn.addEventListener('click', () => {
+          items.forEach(item => {
+            if (item.classList.contains('unread')) {
+              item.classList.remove('unread');
+              item.classList.add('read-all');
+              item.dataset.read = 'true';
+            }
+          });
+          unreadBadge.style.display = 'none';
+        });
+      })();
+    </script>
+  </body>
+</html>

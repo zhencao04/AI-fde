@@ -1,0 +1,11 @@
+const fs = require('fs');
+const envPath = 'C:/wwwroot/ai-fde-observer/.env';
+let c = fs.readFileSync(envPath, 'utf8');
+c = c.replace('LLM_API_KEY=your-deepseek-api-key-here', 'LLM_API_KEY=sk-e5ec8b014dba420fb6c6ed2147f645e2');
+c = c.replace('SERVER_HOST=127.0.0.1', 'SERVER_HOST=0.0.0.0');
+c = c.replace('LLM_SEND_EVENTS=false', 'LLM_SEND_EVENTS=true');
+fs.writeFileSync(envPath, c);
+console.log('env updated successfully');
+console.log(c.match(/LLM_API_KEY=.+/)[0]);
+console.log(c.match(/SERVER_HOST=.+/)[0]);
+console.log(c.match(/LLM_SEND_EVENTS=.+/)[0]);
